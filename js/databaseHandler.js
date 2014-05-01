@@ -22,7 +22,10 @@ DatabaseHandler.prototype.fetch = function(){
                     thing1: res.thing1,
                     thing2: res.thing2,
                     thing3: res.thing3,
-                    likes: res.likes
+                    likes: res.likes,
+                    color1: rainbow(1.0, 0.8),
+                    color2: get_random_color(),
+                    color3: rainbow(0.8, 0.9)
                 };
             });
             self.attachTemplate();
@@ -32,6 +35,36 @@ DatabaseHandler.prototype.fetch = function(){
         console.error("getJSON failed, status: " + textStatus + ", error: "+error);
     });
 };
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+};
+
+function rainbow(sat, light) {
+  // 30 random hues with step of 12 degrees
+  var hue = Math.floor(Math.random() * 30) * 12;
+
+    return $.Color({
+        hue: hue,
+        saturation: sat,
+        lightness: light,
+        alpha: 1
+    }).toHexString();
+};
+
+function get_random_color() {
+    var letters = 'ABCDE'.split('');
+    var color = '#';
+    for (var i=0; i<3; i++ ) {
+        color += letters[Math.floor(Math.random() * letters.length)];
+    }
+    return color;
+}
 
 DatabaseHandler.prototype.attachTemplate = function(){
     var template = Handlebars.compile(this.template);

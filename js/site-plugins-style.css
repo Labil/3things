@@ -1,15 +1,15 @@
 #infoBoxId{
 	width: 500px;
 	height: auto;
-	background-color: black;
-	padding: 5px 10px 10px 10px;
+	background-color: #282828;
+	padding: 10px 10px 20px 20px;
 	border-radius: 15px;
 	z-index: 100;
 }
 #infoToggleButtonId{
 	width: auto;
 	height: auto;
-	background-color: black;
+	background-color: #282828;
 	padding: 5px 10px 5px 10px;
 	border-radius: 15px;
 	z-index: 100;
@@ -23,7 +23,7 @@
 	font-family: sans-serif;
 	font-size: 2em;
 	float: right;
-	top: 5px;
+	top: 10px;
 	right: 20px;
 }
 .infoStyleTitle{

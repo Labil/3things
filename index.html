@@ -5,6 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>3 things.</title>
 		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
 		<script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>
 		<script type="text/javascript" src="js/databaseHandler.js"></script>
 		<script type="text/javascript" src="js/site-plugins.js"></script>
@@ -43,13 +44,13 @@
 							<p class="date">
 								{{date}}
 							</p>
-							<p class="thing">
+							<p class="thing" style="background-color:{{color1}};">
 								1. {{thing1}}
 							</p>
-							<p class="thing">
+							<p class="thing" style="background-color:{{color2}};">
 								2. {{thing2}}
 							</p>
-							<p class="thing">
+							<p class="thing" style="background-color:{{color3}};">
 								3. {{thing3}}
 							</p>
 							<div class="heart">

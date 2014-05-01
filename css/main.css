@@ -88,14 +88,16 @@ element the size of the header to push the rest of the content down */
 	margin-right: 10px;
 	margin-bottom: 15px;
 	display: inline-block;
+	vertical-align: top;
+}
+
+img.hearticon{
+	display: inline-block;
 }
 
 .heart{
 	position: absolute;
 	cursor: pointer;
-	color: red;
-	font-family: sans-serif;
-	font-size: 1.5em;
 	float: right;
 	bottom: 5px;
 	right: 10px;
@@ -167,6 +169,13 @@ p.thing{
 	font-family: sans-serif;
 	font-size: 1em;
 	text-align: left;
+}
+
+p.like{
+	display: inline;
+	color: black;
+	font-family: sans-serif;
+	font-size: 1.2em;
 }
 
 @font-face {

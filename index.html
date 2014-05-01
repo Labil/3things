@@ -5,8 +5,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>3 things.</title>
 		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-		<!--<script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>-->
-		<!--<script type="text/javascript" src="js/databaseHandler.js"></script>-->
+		<script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>
+		<script type="text/javascript" src="js/databaseHandler.js"></script>
 		<script type="text/javascript" src="js/site-plugins.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="css/main.css">
@@ -25,7 +25,7 @@
 			
 
 			<div id="user-menu">
-				<p>TODO</p>
+				<p>Login menu</p>
 			</div>
 			<div class="clear"></div>
 		</div><!--end of header-->
@@ -52,7 +52,10 @@
 							<p class="thing">
 								3. {{thing3}}
 							</p>
-							<div class="heart">{{likes}} X</div>							
+							<div class="heart">
+								<p class="like">{{likes}}</p>
+								<img class="hearticon" width="20" height="17" src="assets/heart_nolikes.png" /> 
+							</div>							
 						</div>
 					{{/each}}
 				</div>	
@@ -86,15 +89,18 @@
 				    'fixed':'false',
 				    'appendLocation':'#about'
 				});
-				/*if(siteMgr == undefined){
+				if(databaseMgr == undefined){
 					//To make chrome not auto-scroll down if user had scrolled down and then refresh of page
 					$(window).on('beforeunload', function() {
 					    $(window).scrollTop(0);
 					});
-					var siteMgr = new SiteManager();
-					siteMgr.init();
+					var databaseMgr = new DatabaseHandler();
+					databaseMgr.init({
+						'container':$('#content'),
+						'template':$('#posts-template').html()
+					});
 
-				}*/
+				}
 
 			})();
 		</script>

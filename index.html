@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>3 things.</title>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<!--<script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>-->
+		<!--<script type="text/javascript" src="js/databaseHandler.js"></script>-->
+		<script type="text/javascript" src="js/site-plugins.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel="stylesheet" type="text/css" href="js/site-plugins-style.css">
+	</head>
+	<body>
+		<div id="header">
+			<div id="about">
+			</div>
+
+			<div class="outer-center">
+					<div id="logo" class="inner-center">
+						<h4 class="logo">3 things.</h4>
+					</div><!--end of inner-center-->
+				</div><!--end of outer-center-->
+			
+
+			<div id="user-menu">
+				<p>TODO</p>
+			</div>
+			<div class="clear"></div>
+		</div><!--end of header-->
+
+		
+
+		<div id="contentPush">
+		</div>
+
+		<div id="content">
+			<script id="posts-template" type="text/x-handlebars-template">
+				<div id="posts-container">
+					{{#each this}}
+						<div class="posts">
+							<p class="date">
+								{{date}}
+							</p>
+							<p class="thing">
+								1. {{thing1}}
+							</p>
+							<p class="thing">
+								2. {{thing2}}
+							</p>
+							<p class="thing">
+								3. {{thing3}}
+							</p>
+							<div class="heart">{{likes}} X</div>							
+						</div>
+					{{/each}}
+				</div>	
+			</script>
+				
+		</div><!--End of content-->
+
+		<br />  
+		<br /> 
+		<br />  
+		<br />  
+		<br /> 
+		<br /> 
+		<br />  
+		<br /> 
+		<br /> 
+
+		<div id="followers">
+			<p>followers</p>
+		</div>
+
+		<script>
+			(function(){
+
+				$.infoToggleBox({
+					'title': 'About',
+					'message1': 'Somebody once suggested to me that, before going to bed every night, I should list three positive things that happened that day and write them down. Even on shitty days. There\'s always something. Blue skies, a good meal, somebody smiles at you on the subway.',
+				    'message2': 'I think it really helps to go to bed in a positive mindset, even after a day where nothing seemed to go your way. Anyway, it helped me, and as a small side project I decided to throw together this tiny conceptual blogplatform.',
+				    'top':0,
+				    'left':20,
+				    'fixed':'false',
+				    'appendLocation':'#about'
+				});
+				/*if(siteMgr == undefined){
+					//To make chrome not auto-scroll down if user had scrolled down and then refresh of page
+					$(window).on('beforeunload', function() {
+					    $(window).scrollTop(0);
+					});
+					var siteMgr = new SiteManager();
+					siteMgr.init();
+
+				}*/
+
+			})();
+		</script>
+	</body>
+</html>

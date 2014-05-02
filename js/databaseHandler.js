@@ -12,6 +12,7 @@ DatabaseHandler.prototype.init = function(config){
     this.loggedInMenu = config.loggedInMenu;
     this.loggedOutMenu = config.loggedOutMenu;
     this.user = null;
+    this.viewUser = null;
     //this.setupScrollHandler();
     this.loadPage();
     this.setupLoginButton();
@@ -29,6 +30,7 @@ DatabaseHandler.prototype.loadPage = function(){
     else{
         //Get the name that comes after the ?user= in the search parameters in the link
         var username = query.match(/user=(.+)/)[1];
+        this.viewUser = username;
         //console.log(this.fetch_url + 'user=' + username);
         $.getJSON(this.fetch_url + 'user=' + username, function(data){
             if(data.status == "OK"){
@@ -172,7 +174,7 @@ DatabaseHandler.prototype.toggleUserMenu = function(loggedIn){
     if(loggedIn){
         this.loggedOutMenu.hide();
         this.loggedInMenu.find('p').remove();
-        this.loggedInMenu.prepend( "<p>Hia, " + this.user + "!</p>" );
+        this.loggedInMenu.prepend("<p class=\"userGreeting\">Hi, " + this.user + "!</p>" );
         this.loggedInMenu.show();
 
     }

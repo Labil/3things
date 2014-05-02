@@ -33,6 +33,7 @@ p.logo{
 
 #header{
 	position: fixed;
+	/*background-color: #f7f7f7;*/
 	background-color: white;
 	width: 100%;
 	height: auto;
@@ -49,9 +50,15 @@ p.logo{
 }
 
 #user-menu{
+	position: absolute;
 	display: inline-block;
-	float: right;
-	right: 0;
+	/*float: right;*/
+	right: 30px;
+	padding: 0 10px 0 10px;
+	border-left: 5px solid #01BDFF;
+	border-right: 5px solid #01BDFF;
+	vertical-align: top;
+	text-align: center;
 }
 
 #logged-out-menu{
@@ -185,6 +192,15 @@ p.like{
 	color: black;
 	font-family: sans-serif;
 	font-size: 1.2em;
+}
+
+p.userGreeting{
+	font-family: sans-serif;
+	font-size: 1.3em;
+	font-weight: bold;
+	padding: 0;
+	margin: 0;
+	margin-bottom:5px;
 }
 
 @font-face {

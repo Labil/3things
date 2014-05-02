@@ -2,38 +2,50 @@
 *   Author: Solveig Hansen 2014
 */
 var DatabaseHandler = function(){
-    this.api_url = 'http://hakestad.io/threethings/php/content_fetcher.php?';
+    this.fetch_url = 'http://hakestad.io/threethings/php/content_fetcher.php?';
+    this.admin_url = 'http://hakestad.io/threethings/php/admin.php?'
 };
 
 DatabaseHandler.prototype.init = function(config){
     this.template = config.template;
     this.container = config.container;
     //this.setupScrollHandler();
-    this.fetch();
+    this.loadPage();
 };
 
-DatabaseHandler.prototype.fetch = function(){
+DatabaseHandler.prototype.loadPage = function(){
     var self = this;
-    $.getJSON(this.api_url + 'req=fetch', function(data){
-        if(data.status == "OK"){
-            self.result = $.map(data.result, function(res){ 
-                return {
-                    date: res.date,
-                    thing1: res.thing1,
-                    thing2: res.thing2,
-                    thing3: res.thing3,
-                    likes: res.likes,
-                    color1: rainbow(1.0, 0.8),
-                    color2: get_random_color(),
-                    color3: rainbow(0.8, 0.9)
-                };
-            });
-            self.attachTemplate();
-        }
-    })
-    .fail(function(d, textStatus, error){
-        console.error("getJSON failed, status: " + textStatus + ", error: "+error);
-    });
+    var query = location.search; //get's the search params in the link
+    //If there's no query for a person, then load startpage
+    if(query == null || query ==''){
+        console.log("Should load start page");
+    }
+    else{
+        //Get the name that comes after the ?user= in the search parameters in the link
+        var username = query.match(/user=(.+)/)[1];
+        //console.log(this.fetch_url + 'user=' + username);
+        $.getJSON(this.fetch_url + 'user=' + username, function(data){
+            if(data.status == "OK"){
+                self.result = $.map(data.result, function(res){ 
+                    return {
+                        id: res.id,
+                        date: res.date,
+                        thing1: res.thing1,
+                        thing2: res.thing2,
+                        thing3: res.thing3,
+                        likes: res.likes,
+                        color1: rainbow(1.0, 0.8),
+                        color2: get_random_color(),
+                        color3: rainbow(0.8, 0.9)
+                    };
+                });
+                self.attachTemplate();
+            }
+        })
+        .fail(function(d, textStatus, error){
+            console.error("getJSON failed, status: " + textStatus + ", error: "+error);
+        });
+    }
 };
 
 function getRandomColor() {

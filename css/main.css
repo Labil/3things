@@ -54,6 +54,13 @@ p.logo{
 	right: 0;
 }
 
+#logged-out-menu{
+	display: none;
+}
+
+#logged-in-menu{
+	display: none;
+}
 /*Because header is fixed it doesn't take up space of the page. Need an (empty)
 element the size of the header to push the rest of the content down */ 
 #contentPush {

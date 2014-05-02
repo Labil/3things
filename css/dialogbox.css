@@ -1,0 +1,153 @@
+#dialogOverlay{
+    width:100%;
+    height:100%;
+    position:fixed;
+    top:0;
+    left:0;
+    background: -moz-linear-gradient(rgba(11,11,11,0.1), rgba(11,11,11,0.6)) repeat-x rgba(11,11,11,0.2);
+    background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(11,11,11,0.1)), to(rgba(11,11,11,0.6))) repeat-x rgba(11,11,11,0.2);
+    z-index:100000;
+}
+
+#dialogBox{
+    background-color:#F3F3F3;
+    width:auto;
+    position:fixed;
+    left:50%;
+    top:50%;
+    border-radius: 8px 8px 8px 8px;
+}
+
+#dialogBox p{
+    font-size:20px;
+    line-height:1.4;
+    font-family:; 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    padding: 10px;
+    padding-top: 35px;
+    padding-left: 30px;
+    padding-right: 30px;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6);
+    color:#666;
+}
+
+#dialogButtons{
+    padding:15px 0 25px;
+    text-align:center;
+}
+
+#dialogBox .button, #loginBox .button{
+    margin-right: 15px;
+    padding: 10px 25px 9px 25px;
+    text-decoration:none;
+    border:none;
+}
+
+#dialogBox .button:last-child, #loginBox .button:last-child{
+	margin-right:0;
+}
+
+
+/******************** Popup ******************************/
+
+#popupBox{
+    background-color:#3498DB;
+    width:auto;
+    position:fixed;
+    left:50%;
+    top:50%;
+    border-radius: 8px 8px 8px 8px;
+}
+
+#popupBox p{
+    font-size:20px;
+    line-height:1.4;
+    font-family:; 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    padding: 10px 25px 9px 25px;
+    color:white;
+}
+
+/******************** Tipbox ******************************/
+
+#tipBox{
+    background-color:#060606;
+    /*width:220px;*/
+    width:330px;
+    border-radius: 8px 8px 8px 8px; /* Looks weird with rounded corners combined with the arrow, but think i prefer w/o arrow */
+    padding: 7px 22px 11px 22px;
+}
+
+#tipBox p{
+    font-size:18px;
+    line-height:1.4;
+    font-family:; 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    color:white;
+}
+
+#tipBox h2{
+    font-size:20px;
+    line-height:1.4;
+    font-family:; 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    color:white;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0;
+}
+
+/*#tipBox:before {
+    content: "";
+    display: block;
+    width: 0; 
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 12px solid white; 
+    /*border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 12px solid white; */
+  /*  position: absolute;
+    top: 16px;
+    left: 300px;
+}*/
+
+/****************************** Scroll to top button *********************************/
+#scrollTop{
+    position: fixed;
+    width: auto;
+    height: auto;
+    cursor: pointer;
+    z-index:100000;
+    font-family: Arial;
+    color: white;
+    padding: 5px 10px 5px 10px;
+    background-color: #060606;
+    font-size: 20px;
+    border: 1px solid #1C1C1F;
+}
+
+
+/**************************** Loading message ***********************/
+
+#loadingbar{
+    width: auto;
+}
+ #loadingbar p{
+    font-size: 24px;
+    color: white;
+    font-family: 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+ }
+
+ /********************* Login popup ****************/
+ /*.block{
+    display: block;
+    margin-bottom: 10px;
+ }*/
+
+ #loginBox{
+    background-color:#060606;
+    width:auto;
+    position:fixed;
+    left:50%;
+    top:50%;
+    padding: 20px;
+    border-radius: 8px 8px 8px 8px;
+ }

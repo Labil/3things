@@ -9,9 +9,11 @@
 		<script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>
 		<script type="text/javascript" src="js/databaseHandler.js"></script>
 		<script type="text/javascript" src="js/site-plugins.js"></script>
+		<script type="text/javascript" src="js/dialogbox.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<link rel="stylesheet" type="text/css" href="js/site-plugins-style.css">
+		<link rel="stylesheet" type="text/css" href="css/dialogbox.css">
 	</head>
 	<body>
 		<div id="header">
@@ -26,12 +28,18 @@
 			
 
 			<div id="user-menu">
-				<p>Login menu</p>
+				<span id="logged-in-menu">
+					<p>Welcomemessage</p>
+					<button id="logout">Log out</button>
+				</span>
+
+				<span id="logged-out-menu">
+					<button id="login">Log in</button>
+					<button id="login">Sign up</button>
+				</span>
 			</div>
 			<div class="clear"></div>
 		</div><!--end of header-->
-
-		
 
 		<div id="contentPush">
 		</div>
@@ -75,7 +83,7 @@
 		<br /> 
 
 		<div id="followers">
-			<p>followers</p>
+			<p>followers TODO</p>
 		</div>
 
 		<script>
@@ -98,11 +106,11 @@
 					var databaseMgr = new DatabaseHandler();
 					databaseMgr.init({
 						'container':$('#content'),
-						'template':$('#posts-template').html()
+						'template':$('#posts-template').html(),
+						'loggedInMenu': $('#logged-in-menu'),
+						'loggedOutMenu':$('#logged-out-menu')
 					});
-
 				}
-
 			})();
 		</script>
 	</body>

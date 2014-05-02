@@ -9,8 +9,12 @@ var DatabaseHandler = function(){
 DatabaseHandler.prototype.init = function(config){
     this.template = config.template;
     this.container = config.container;
+    this.loggedInMenu = config.loggedInMenu;
+    this.loggedOutMenu = config.loggedOutMenu;
+    this.user = null;
     //this.setupScrollHandler();
     this.loadPage();
+    this.setupUserMenu();
 };
 
 DatabaseHandler.prototype.loadPage = function(){
@@ -43,11 +47,51 @@ DatabaseHandler.prototype.loadPage = function(){
             }
         })
         .fail(function(d, textStatus, error){
+            //If error, should load start page or 404 page
+            console.log("Should load start page?");
             console.error("getJSON failed, status: " + textStatus + ", error: "+error);
         });
     }
 };
 
+DatabaseHandler.prototype.attachTemplate = function(){
+    var template = Handlebars.compile(this.template);
+    this.container.append(template(this.result));
+};
+
+DatabaseHandler.prototype.isLoggedIn = function(){
+    var self = this;
+    $.getJSON(this.admin_url + 'req=checkLoggedIn', function(data){
+        console.log("Is logged in: " + data.logged_in);
+        if(data.logged_in == 'YES'){
+            console.log(data.username);
+            this.user = data.username;
+            return true;
+        }
+        else return false;
+    })
+    .fail(function(d, textStatus, error){
+        console.error("Checking if logged in failed in sessions.php, status: " + textStatus + ", error: "+error);
+        return false;
+    });
+};
+
+DatabaseHandler.prototype.login = function(){
+
+};
+
+DatabaseHandler.prototype.setupUserMenu = function(){
+    if(this.isLoggedIn()){
+        this.loggedOutMenu.hide();
+        this.loggedInMenu.show();
+    }
+    else{
+        this.loggedInMenu.hide();
+        this.loggedOutMenu.show();
+    }
+};
+
+/*************************** Extra functions, should be moved ****************************/
 function getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
@@ -78,12 +122,8 @@ function get_random_color() {
     return color;
 }
 
-DatabaseHandler.prototype.attachTemplate = function(){
-    var template = Handlebars.compile(this.template);
-    this.container.append(template(this.result));
-};
 
-DatabaseHandler.prototype.handleContactForm = function(button, form, feedback){
+/*DatabaseHandler.prototype.handleContactForm = function(button, form, feedback){
     var self = this;
     button.on('click', function(e){
         e.preventDefault();
@@ -141,4 +181,4 @@ DatabaseHandler.prototype.toggleScrollToTop = function(){
     }) == false){
         $.backToTopButton.hide();
     }
-};
+};*/

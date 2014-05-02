@@ -14,7 +14,9 @@ DatabaseHandler.prototype.init = function(config){
     this.user = null;
     //this.setupScrollHandler();
     this.loadPage();
-    this.setupUserMenu();
+    this.setupLoginButton();
+    this.setupLogoutButton();
+    this.checkIfLoggedIn();
 };
 
 DatabaseHandler.prototype.loadPage = function(){
@@ -59,36 +61,131 @@ DatabaseHandler.prototype.attachTemplate = function(){
     this.container.append(template(this.result));
 };
 
-DatabaseHandler.prototype.isLoggedIn = function(){
+DatabaseHandler.prototype.checkIfLoggedIn = function(){
     var self = this;
     $.getJSON(this.admin_url + 'req=checkLoggedIn', function(data){
-        console.log("Is logged in: " + data.logged_in);
         if(data.logged_in == 'YES'){
-            console.log(data.username);
-            this.user = data.username;
+            self.user = data.username;
+            self.toggleUserMenu(true);
             return true;
         }
-        else return false;
+        else{
+            self.user = null;
+            self.toggleUserMenu(false);
+            return false;
+        }
     })
     .fail(function(d, textStatus, error){
         console.error("Checking if logged in failed in sessions.php, status: " + textStatus + ", error: "+error);
+        self.toggleUserMenu(false);
         return false;
     });
 };
 
-DatabaseHandler.prototype.login = function(){
+DatabaseHandler.prototype.setupLoginButton = function(){
+    var self = this;
+    //Button to open login prompt
+    $('#login').on('click', function(e){
+        e.preventDefault();
+        var notDoneMsg = 'Please fill in both fields :)';
+        
+        $.loginpopup({
+            'message'   : 'Input username and password.',
+            'buttons'   : {
+                'Log in'   : {
+                    //Now this is dependent on flatUI for the button styling, 
+                    //should be specified in the dialogbox.css instead, but I'm lazy for the moment
+                    'class' : 'btn btn-block btn-lg btn-success',
+                    'action': function(){
+                        var username = $('#loginBox').find('#username').val();
+                        var password = $('#loginBox').find('#password').val();
+                        console.log(username + password);
 
+                        if(username == "" || password == ""){
+                            self.popupMessage(notDoneMsg);
+                            return;
+                        }
+                        self.checkLogin(username, password);
+                    }
+                },
+                'Avbryt'    : {
+                    'class' : 'btn btn-block btn-lg btn-default',
+                    'action': function(){}  // Nothing to do in this case.
+                }
+            }
+        });
+    });
 };
 
-DatabaseHandler.prototype.setupUserMenu = function(){
-    if(this.isLoggedIn()){
+DatabaseHandler.prototype.checkLogin = function(username, password){
+    var self = this;
+    var successMsg = 'Hooray, you\'re logged in!';
+    var notLoggedInMsg = 'Sorry, the username and/or password was incorrect.';
+    var failMsg = 'Wops, something went awry... Try again or ask Solveig for help is the problem persists. :)';
+    
+    var data = {
+        'user' : username,
+        'p' : password
+    };
+    $.getJSON(self.admin_url + "req=login", data, function(response) {
+        console.log(response.logged_in);
+        if(response.logged_in == 'YES'){
+            self.popupMessage(successMsg);
+            self.checkIfLoggedIn();
+        }
+        else {
+            self.popupMessage(notLoggedInMsg);
+            self.checkIfLoggedIn();
+        }
+    })
+    .fail(function(d, textStatus, error) {
+        self.popupMessage(failMsg);
+        self.checkIfLoggedIn();
+        console.error("The request failed, status: " + textStatus + ", error: "+error);
+    });
+};
+
+DatabaseHandler.prototype.setupLogoutButton = function(){
+    var self = this;
+    $('#logout').on('click', function(e){
+        e.preventDefault();
+        self.logout();
+    });
+};
+
+DatabaseHandler.prototype.logout = function(){
+    var self = this;
+    $.getJSON(this.admin_url + "req=logout", function(response) {
+        console.log(response.status);
+        if(response.status == "OK"){
+            self.popupMessage("You successfully logged out! Good job.");
+            self.checkIfLoggedIn();
+        }
+    })
+    .fail(function(d, textStatus, error) {
+        self.popupMessage("Something went wrong with your request. Try again!");
+        console.error("The request failed, status: " + textStatus + ", error: "+error);
+    });
+};
+
+DatabaseHandler.prototype.toggleUserMenu = function(loggedIn){
+    if(loggedIn){
         this.loggedOutMenu.hide();
+        this.loggedInMenu.find('p').remove();
+        this.loggedInMenu.prepend( "<p>Hia, " + this.user + "!</p>" );
         this.loggedInMenu.show();
+
     }
     else{
         this.loggedInMenu.hide();
         this.loggedOutMenu.show();
     }
+};
+
+DatabaseHandler.prototype.popupMessage = function(message){
+    $.popupbox({
+        'message'   : message
+    });
 };
 
 /*************************** Extra functions, should be moved ****************************/

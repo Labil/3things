@@ -5,7 +5,7 @@
     /* User can specify displacement either from (default)top/left, top/right, bottom/left, bottom/right
        Only if first two params is null (or no value sent in), then bottom and right will be used. 
        @fixed decides position type fixed instead of default absolute */
-    $.fn.placement = function (top, left, bottom, right, fixed) {
+   /* $.fn.placement = function (top, left, bottom, right, fixed) {
         if(fixed != null && fixed === true){
             this.css("position","fixed");
         }
@@ -24,7 +24,7 @@
             this.css("right", right + "px");   
         }
         return this;
-    }
+    }*/
 
     /* Config:
      * config.message, config.title,

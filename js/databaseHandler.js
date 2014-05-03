@@ -18,12 +18,13 @@ DatabaseHandler.prototype.init = function(config){
     this.setupLoginButton();
     this.setupSignupButton();
     this.setupLogoutButton();
-    this.checkIfLoggedIn();
+    this.updatePage();
 };
 
 DatabaseHandler.prototype.loadPage = function(){
     var self = this;
     var query = location.search; //get's the search params in the link
+
     //If there's no query for a person, then load startpage
     if(query == null || query ==''){
         console.log("Should load start page");
@@ -31,9 +32,9 @@ DatabaseHandler.prototype.loadPage = function(){
     else{
         //Get the name that comes after the ?user= in the search parameters in the link
         var username = query.match(/user=(.+)/)[1];
-        this.viewUser = username;
+        self.viewUser = username;
         //console.log(this.fetch_url + 'user=' + username);
-        $.getJSON(this.fetch_url + 'user=' + username, function(data){
+        $.getJSON(self.fetch_url + 'user=' + username, function(data){
             if(data.status == "OK"){
                 self.result = $.map(data.result, function(res){ 
                     return {
@@ -64,7 +65,8 @@ DatabaseHandler.prototype.attachTemplate = function(){
     this.container.append(template(this.result));
 };
 
-DatabaseHandler.prototype.checkIfLoggedIn = function(){
+//This function handles what should be displayed in the menues and such.
+DatabaseHandler.prototype.updatePage = function(){
     var self = this;
     $.getJSON(this.admin_url + 'req=checkLoggedIn', function(data){
         if(data.logged_in == 'YES'){
@@ -79,7 +81,7 @@ DatabaseHandler.prototype.checkIfLoggedIn = function(){
         }
     })
     .fail(function(d, textStatus, error){
-        console.error("Checking if logged in failed in sessions.php, status: " + textStatus + ", error: "+error);
+        console.error("Checking if logged in failed in admin.php, status: " + textStatus + ", error: "+error);
         self.toggleUserMenu(false);
         return false;
     });
@@ -137,11 +139,11 @@ DatabaseHandler.prototype.checkLogin = function(username, password){
         console.log(response.logged_in);
         if(response.logged_in == 'YES'){
             self.popupMessage(successMsg);
-            self.checkIfLoggedIn();
+            self.updatePage();
         }
         else {
             self.popupMessage(notLoggedInMsg);
-            self.checkIfLoggedIn();
+            self.updatePage();
             //Opens back up again the login form
             setTimeout(function(){
                 $('#login').trigger("click");
@@ -151,7 +153,7 @@ DatabaseHandler.prototype.checkLogin = function(username, password){
     })
     .fail(function(d, textStatus, error) {
         self.popupMessage(failMsg);
-        self.checkIfLoggedIn();
+        self.updatePage();
         console.error("The request failed, status: " + textStatus + ", error: "+error);
     });
 };
@@ -225,7 +227,7 @@ DatabaseHandler.prototype.logout = function(){
         console.log(response.status);
         if(response.status == "OK"){
             self.popupMessage("You successfully logged out! Good job.");
-            self.checkIfLoggedIn();
+            self.updatePage();
         }
     })
     .fail(function(d, textStatus, error) {
@@ -243,7 +245,7 @@ DatabaseHandler.prototype.signUp = function(username, password){
     $.getJSON(this.admin_url + "req=signup", data, function(response){
         console.log(response.logged_in + ", " + response.username);
         self.popupMessage("You are now signed up and logged in. Woo =)");
-        self.checkIfLoggedIn();
+        self.updatePage();
     });
 };
 
@@ -251,7 +253,7 @@ DatabaseHandler.prototype.toggleUserMenu = function(loggedIn){
     if(loggedIn){
         this.loggedOutMenu.hide();
         this.loggedInMenu.find('p').remove();
-        this.loggedInMenu.prepend("<p class=\"userGreeting\">Hi, " + this.user + "!</p>" );
+        this.loggedInMenu.prepend('<a href="http://hakestad.io/threethings/?user=' + this.user + '"><p class="userGreeting">Hi, ' + this.user + '!</p></a>' );
         this.loggedInMenu.show();
 
     }

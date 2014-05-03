@@ -2,7 +2,7 @@
 *   Author: Solveig Hansen 2014
 */
 var DatabaseHandler = function(){
-    this.fetch_url = 'http://hakestad.io/threethings/php/content_fetcher.php?';
+    this.db_url = 'http://hakestad.io/threethings/php/db_handler.php?';
     this.admin_url = 'http://hakestad.io/threethings/php/admin.php?'
 };
 
@@ -33,8 +33,8 @@ DatabaseHandler.prototype.loadPage = function(){
         //Get the name that comes after the ?user= in the search parameters in the link
         var username = query.match(/user=(.+)/)[1];
         self.viewUser = username;
-        //console.log(this.fetch_url + 'user=' + username);
-        $.getJSON(self.fetch_url + 'user=' + username, function(data){
+        console.log(this.db_url + 'req=fetch&user=' + username);
+        $.getJSON(self.db_url + 'req=fetch&user=' + username, function(data){
             if(data.status == "OK"){
                 self.result = $.map(data.result, function(res){ 
                     return {
@@ -245,7 +245,19 @@ DatabaseHandler.prototype.signUp = function(username, password){
     $.getJSON(this.admin_url + "req=signup", data, function(response){
         console.log(response.logged_in + ", " + response.username);
         self.popupMessage("You are now signed up and logged in. Woo =)");
-        self.updatePage();
+        
+        
+    })
+    .done(function(){
+        $.getJSON(self.db_url + "req=insertFirstPost", {'user':username}, function(response){
+            if(response.status == 'OK'){
+                console.log("Inserted");
+
+                setTimeout(function(){
+                    location.search = '?user=' + username; 
+                }, 1500);
+            }
+        });
     });
 };
 

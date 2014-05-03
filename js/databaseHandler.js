@@ -13,6 +13,11 @@ DatabaseHandler.prototype.init = function(config){
     this.loggedOutMenu = config.loggedOutMenu;
     this.user = null;
     this.viewUser = null;
+
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var date = d.getDate();
+    this.today = d.getFullYear() + "-" + (month.length == 1 ? month : ("0" + month)) + "-" + (date.length == 1 ? date : ("0" + date)); //Y-M-D
     //this.setupScrollHandler();
     this.loadPage();
     this.setupLoginButton();
@@ -33,10 +38,13 @@ DatabaseHandler.prototype.loadPage = function(){
         //Get the name that comes after the ?user= in the search parameters in the link
         var username = query.match(/user=(.+)/)[1];
         self.viewUser = username;
+
         console.log(this.db_url + 'req=fetch&user=' + username);
         $.getJSON(self.db_url + 'req=fetch&user=' + username, function(data){
             if(data.status == "OK"){
                 self.result = $.map(data.result, function(res){ 
+                    if(res.date == self.today) colOutline = "#9aeaed";
+                    else colOutline = "#d6d6d6";
                     return {
                         id: res.id,
                         date: res.date,
@@ -46,7 +54,8 @@ DatabaseHandler.prototype.loadPage = function(){
                         likes: res.likes,
                         color1: rainbow(1.0, 0.8),
                         color2: get_random_color(),
-                        color3: rainbow(0.8, 0.9)
+                        color3: rainbow(0.8, 0.9),
+                        colorOutline: colOutline
                     };
                 });
                 self.attachTemplate();

@@ -38,24 +38,32 @@ DatabaseHandler.prototype.loadPage = function(){
         //Get the name that comes after the ?user= in the search parameters in the link
         var username = query.match(/user=(.+)/)[1];
         self.viewUser = username;
+        var colOutline, heartIconSrc, col1, col2, col3;
 
         console.log(this.db_url + 'req=fetch&user=' + username);
         $.getJSON(self.db_url + 'req=fetch&user=' + username, function(data){
             if(data.status == "OK"){
                 self.result = $.map(data.result, function(res){ 
-                    if(res.date == self.today) colOutline = "#9aeaed";
-                    else colOutline = "#d6d6d6";
+                    //Adding appropiate graphics and color styles to the posts
+                    res.date == self.today ? colOutline = "#9aeaed" : colOutline = "#d6d6d6";
+                    res.likes > 0 ? heartIconSrc = "assets/heart_likes.png" : heartIconSrc = "assets/heart_nolikes.png";
+                    res.thing1 == "" ? col1 = "#d6d6d6" : col1 = rainbow(1.0, 0.8);
+                    res.thing2 == "" ? col2 = "#d6d6d6" : col2 = get_random_color();
+                    res.thing3 == "" ? col3 = "#d6d6d6" : col3 = rainbow(0.8, 0.9);
+
                     return {
                         id: res.id,
+                        user: res.user,
                         date: res.date,
                         thing1: res.thing1,
                         thing2: res.thing2,
                         thing3: res.thing3,
                         likes: res.likes,
-                        color1: rainbow(1.0, 0.8),
-                        color2: get_random_color(),
-                        color3: rainbow(0.8, 0.9),
-                        colorOutline: colOutline
+                        color1: col1,
+                        color2: col2,
+                        color3: col3,
+                        colorOutline: colOutline,
+                        heart: heartIconSrc
                     };
                 });
                 self.attachTemplate();
@@ -81,11 +89,13 @@ DatabaseHandler.prototype.updatePage = function(){
         if(data.logged_in == 'YES'){
             self.user = data.username;
             self.toggleUserMenu(true);
+            self.enableEditPosts();
             return true;
         }
         else{
             self.user = null;
             self.toggleUserMenu(false);
+            self.disableEditPosts();
             return false;
         }
     })
@@ -94,6 +104,31 @@ DatabaseHandler.prototype.updatePage = function(){
         self.toggleUserMenu(false);
         return false;
     });
+};
+
+//TODO
+DatabaseHandler.prototype.disableEditPosts = function(){
+    console.log("Disabling edit posts");
+};
+
+DatabaseHandler.prototype.enableEditPosts = function(){
+    var self = this;
+   //Filters out the post that has today's date and belongs to logged in user.
+   //When user clicks on post, exchange text with input fields containing the text for edit or no text if empty fields
+    $('.posts').filter(function(index){
+        var $this = $(this);
+        return ($this.data('user') == self.user && $this.data('date') == "2014-05-01");
+    }).css("cursor", "pointer").on('click', function(){
+        $(this).children('p.thing').each(function(index){
+            var txt = "";
+            txt = $(this).text().trim().replace(/[0-9]\. /, "");
+            console.log(txt);
+            $(this).replaceWith('<p class="thing-edit">' + (index + 1) + '. </p><input class="input-post" type="text" value="' + txt +'"" />');
+        });
+    });
+
+    //Get the name that comes after the ?user= in the search parameters in the link
+    //var username = query.match(/user=(.+)/)[1];
 };
 
 DatabaseHandler.prototype.setupLoginButton = function(){

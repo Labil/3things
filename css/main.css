@@ -178,13 +178,22 @@ p.date{
 	font-size: 0.8em;
 }
 
-p.thing{
+p.thing, p.thing-edit{
 	color: black;
 	font-family: sans-serif;
 	font-size: 1em;
 	text-align: left;
 	padding:4px 6px;
 	border-radius: 6px;
+}
+
+p.thing-edit{
+	display: inline-block;
+	margin-top: 0;
+}
+
+input.input-post{
+	display: inline-block;
 }
 
 p.like{

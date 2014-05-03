@@ -49,7 +49,7 @@
 			<script id="posts-template" type="text/x-handlebars-template">
 				<div id="posts-container">
 					{{#each this}}
-						<div class="posts" style="border: 2px solid {{colorOutline}};">
+						<div id="{{id}}" class="posts" data-user="{{user}}" data-date="{{date}}" data-id="{{id}}" style="border: 2px solid {{colorOutline}};">
 							<p class="date">
 								{{date}}
 							</p>
@@ -64,7 +64,7 @@
 							</p>
 							<div class="heart">
 								<p class="like">{{likes}}</p>
-								<img class="hearticon" width="20" height="17" src="assets/heart_nolikes.png" /> 
+								<img class="hearticon" width="20" height="17" src="{{heart}}" /> 
 							</div>							
 						</div>
 					{{/each}}

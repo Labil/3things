@@ -16,6 +16,7 @@ DatabaseHandler.prototype.init = function(config){
     //this.setupScrollHandler();
     this.loadPage();
     this.setupLoginButton();
+    this.setupSignupButton();
     this.setupLogoutButton();
     this.checkIfLoggedIn();
 };
@@ -101,18 +102,21 @@ DatabaseHandler.prototype.setupLoginButton = function(){
                     'action': function(){
                         var username = $('#loginBox').find('#username').val();
                         var password = $('#loginBox').find('#password').val();
-                        console.log(username + password);
 
                         if(username == "" || password == ""){
-                            self.popupMessage(notDoneMsg);
-                            return;
+                            this.displayMsg(notDoneMsg);
+                            return false;
                         }
                         self.checkLogin(username, password);
+                        return true;
+                    },
+                    'displayMsg' : function(msg){
+                        $('#loginMsgErr').text(msg);
                     }
                 },
-                'Avbryt'    : {
+                'Cancel'    : {
                     'class' : 'btn btn-block btn-lg btn-default',
-                    'action': function(){}  // Nothing to do in this case.
+                    'action': function(){ return true; }  //Returns true to close the popup
                 }
             }
         });
@@ -138,6 +142,11 @@ DatabaseHandler.prototype.checkLogin = function(username, password){
         else {
             self.popupMessage(notLoggedInMsg);
             self.checkIfLoggedIn();
+            //Opens back up again the login form
+            setTimeout(function(){
+                $('#login').trigger("click");
+            }, 1000);
+            
         }
     })
     .fail(function(d, textStatus, error) {
@@ -155,6 +164,61 @@ DatabaseHandler.prototype.setupLogoutButton = function(){
     });
 };
 
+DatabaseHandler.prototype.setupSignupButton = function(){
+    var self = this;
+    $('#signup').on('click', function(e){
+        e.preventDefault();
+        
+        $.loginpopup({
+            'message'   : 'Create a username and password. Username can be 2-20 characters long. Password must be 8-20 characters long.',
+            'buttons'   : {
+                'Create user'   : {
+                    //Now this is dependent on flatUI for the button styling, 
+                    //should be specified in the dialogbox.css instead, but I'm lazy for the moment
+                    'class' : 'btn btn-block btn-lg btn-success',
+                    'action': function(){
+                        var username = $('#loginBox').find('#username').val();
+                        var password = $('#loginBox').find('#password').val();
+                        var objThis = this;
+                        if(username == "" || password == ""){
+                            this.displayMsg('Please fill in both fields :)');
+                            return false;
+                        }
+                        else if(username.length < 2 || username.length > 20){
+                            this.displayMsg("Your username must be 2-20 characters long.");
+                            return false;
+                        }
+                        else if(password.length < 8 || password.length > 20){
+                            this.displayMsg("Your password must contain from 8 to 20 characters.");
+                            return false;
+                        }
+                        $.getJSON(self.admin_url + "req=checkUsername", {'user' : username}, function(res){
+                            if(res.status == "OK"){
+                                self.signUp(username, password);
+                                return true;
+                            }
+                            else{
+                                objThis.displayMsg("That username is already taken. Try a different one!");
+                                return false;
+                            }
+                        });
+                        return true; //To make sure it closes after reaching end of function
+                    },
+                    'displayMsg' : function(msg){
+                        $('#loginMsgErr').text(msg);
+                    }
+                },
+                'Cancel'    : {
+                    'class' : 'btn btn-block btn-lg btn-default',
+                    'action': function(){
+                        return true;
+                    }  // Return true to trigger closing of the popup
+                }
+            }
+        });
+    });
+};
+
 DatabaseHandler.prototype.logout = function(){
     var self = this;
     $.getJSON(this.admin_url + "req=logout", function(response) {
@@ -167,6 +231,19 @@ DatabaseHandler.prototype.logout = function(){
     .fail(function(d, textStatus, error) {
         self.popupMessage("Something went wrong with your request. Try again!");
         console.error("The request failed, status: " + textStatus + ", error: "+error);
+    });
+};
+
+DatabaseHandler.prototype.signUp = function(username, password){
+    var self = this;
+    var data = {
+        'user' : username,
+        'p' : password
+    };
+    $.getJSON(this.admin_url + "req=signup", data, function(response){
+        console.log(response.logged_in + ", " + response.username);
+        self.popupMessage("You are now signed up and logged in. Woo =)");
+        self.checkIfLoggedIn();
     });
 };
 

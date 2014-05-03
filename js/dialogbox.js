@@ -194,6 +194,7 @@
                 '<input class="form-control add" id="username" placeholder="Username">',
                 '<input type="password" class="form-control add" id="password" placeholder="Password">',
             '</form>',
+            '<p id="loginMsgErr"></p>',
             '<div id="dialogButtons">',
             buttonHTML,
             '</div></div></div>'
@@ -209,9 +210,10 @@
 
         $.each(config.buttons,function(name,obj){
             buttons.eq(i++).click(function(){
-                obj.action();
-                $.loginpopup.hide();
-                return false;
+                if(obj.action()){
+                    $.loginpopup.hide();
+                    return false;
+                }
             });
         });
     };

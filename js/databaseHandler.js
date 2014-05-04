@@ -67,6 +67,10 @@ DatabaseHandler.prototype.loadPage = function(){
                     };
                 });
                 self.attachTemplate();
+                setTimeout(function(){
+                    self.enableEditPosts();    
+                }, 1000);
+                
             }
         })
         .fail(function(d, textStatus, error){
@@ -89,7 +93,6 @@ DatabaseHandler.prototype.updatePage = function(){
         if(data.logged_in == 'YES'){
             self.user = data.username;
             self.toggleUserMenu(true);
-            self.enableEditPosts();
             return true;
         }
         else{
@@ -114,21 +117,39 @@ DatabaseHandler.prototype.disableEditPosts = function(){
 DatabaseHandler.prototype.enableEditPosts = function(){
     var self = this;
    //Filters out the post that has today's date and belongs to logged in user.
-   //When user clicks on post, exchange text with input fields containing the text for edit or no text if empty fields
+   //When user clicks on items in the post, exchange text with input fields containing the text for edit or no text if empty field
     $('.posts').filter(function(index){
-        var $this = $(this);
-        return ($this.data('user') == self.user && $this.data('date') == "2014-05-01");
-    }).css("cursor", "pointer").on('click', function(){
-        $(this).children('p.thing').each(function(index){
-            var txt = "";
-            txt = $(this).text().trim().replace(/[0-9]\. /, "");
-            console.log(txt);
-            $(this).replaceWith('<p class="thing-edit">' + (index + 1) + '. </p><input class="input-post" type="text" value="' + txt +'"" />');
-        });
-    });
+        var $post = $(this);
+        return ($post.data('user') == self.user && $post.data('date') == "2014-05-01");
+    }).children('p.thing').each(function(index){
+        var $p = $(this);
+        console.log($p.parent().data('id'));
+        $p.css("cursor", "pointer");
+        $p.on('click', function(){
+            var txt = $p.text().trim().replace(/[0-9]\. /, "");
+            $p.replaceWith('<p class="thing-edit">' + (index + 1) + '. </p>' +
+                '<input id="' + (index + 1) + '" class="input-post" type="text" value="' + txt +'"" />');
 
-    //Get the name that comes after the ?user= in the search parameters in the link
-    //var username = query.match(/user=(.+)/)[1];
+            var input = $('.input-post');
+
+            input.focus(function(){
+                console.log('in ' + this.id);
+            }).blur(function(){
+                console.log('out' + this.id);
+            });
+
+            input.focus();
+
+           /* $('.input-post').focus(function(){
+                console.log('in ' + this.id);
+            }).blur(function(){
+                console.log('out ' + this.id);
+                $p.replaceWith('<p class="thing" style="background-color:' + getRandomColor() + ';">' + this.id + '. ' +
+                    txt + '</p>');
+            });*/
+        });
+        
+    });
 };
 
 DatabaseHandler.prototype.setupLoginButton = function(){

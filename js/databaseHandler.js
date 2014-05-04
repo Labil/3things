@@ -40,7 +40,7 @@ DatabaseHandler.prototype.loadPage = function(){
         self.viewUser = username;
         var colOutline, heartIconSrc, col1, col2, col3;
 
-        console.log(this.db_url + 'req=fetch&user=' + username);
+        //console.log(this.db_url + 'req=fetch&user=' + username);
         $.getJSON(self.db_url + 'req=fetch&user=' + username, function(data){
             if(data.status == "OK"){
                 self.result = $.map(data.result, function(res){ 
@@ -118,7 +118,7 @@ DatabaseHandler.prototype.enableEditPosts = function(){
     var self = this;
    //Filters out the post that has today's date and belongs to logged in user.
    //When user clicks on items in the post, exchange text with input fields containing the text for edit or no text if empty field
-    $('.posts').filter(function(index){
+    /*$('.posts').filter(function(index){
         var $post = $(this);
         return ($post.data('user') == self.user && $post.data('date') == "2014-05-01");
     }).children('p.thing').each(function(index){
@@ -130,7 +130,7 @@ DatabaseHandler.prototype.enableEditPosts = function(){
             $p.replaceWith('<p class="thing-edit">' + (index + 1) + '. </p>' +
                 '<input id="' + (index + 1) + '" class="input-post" type="text" value="' + txt +'"" />');
 
-            var input = $('.input-post');
+            var input = $('input#' + (index + 1));
 
             input.focus(function(){
                 console.log('in ' + this.id);
@@ -140,15 +140,73 @@ DatabaseHandler.prototype.enableEditPosts = function(){
 
             input.focus();
 
-           /* $('.input-post').focus(function(){
-                console.log('in ' + this.id);
-            }).blur(function(){
-                console.log('out ' + this.id);
-                $p.replaceWith('<p class="thing" style="background-color:' + getRandomColor() + ';">' + this.id + '. ' +
-                    txt + '</p>');
-            });*/
+        });*/
+
+    $('.posts').filter(function(index){
+        var $post = $(this);
+        return ($post.data('user') == self.user && $post.data('date') == self.today);
+    }).css("cursor", "pointer").on('click', function(){
+        var $post = $(this);
+        var texts = [3];
+        $post.children('p.thing').each(function(index){
+            var $p = $(this);
+            var txt = $p.text().replace(/[0-9]\./, "").trim();
+            console.log(txt);
+            texts[index] = txt;
         });
-        
+        self.spawnEditor($post, texts);
+    });
+};
+
+DatabaseHandler.prototype.spawnEditor = function($post, texts){
+    var markup = [
+        '<div id="dialogOverlay">' +
+            '<div id ="editor">' +
+                '<p class="date">' + $post.data('date') + '</p>' +
+                '<form id="edit-form" action="">' +
+                    '<p class="thing-edit">1. </p>' +
+                    '<input id="edit1" class="input-post" type="text" value="' + texts[0] +'" />' +
+                    '<p class="thing-edit">2. </p>' +
+                    '<input id="edit2" class="input-post" type="text" value="' + texts[1] +'" />' +
+                    '<p class="thing-edit">3. </p>' +
+                    '<input id="edit3" class="input-post" type="text" value="' + texts[2] +'" />' +
+                    '<button type="submit" id="edit-form-submit">Save</button>' +
+                '</form>' +
+            '</div>' +
+        '</div>'
+    ].join('');
+
+    $(markup).hide().appendTo('body').fadeIn();
+    $('#editor').center();
+
+    var form = $('#edit-form');
+    var self = this;
+    var postId = $post.data('id');
+
+    form.submit(function(e){
+        e.preventDefault();
+        var data = {
+            'edit1': $('#edit1').val(),
+            'edit2': $('#edit2').val(),
+            'edit3': $('#edit3').val()
+        };
+        $.post(self.db_url + "req=edit&postId=" + postId, data, function(response){
+            if(response.status == "OK") {
+                $('#dialogOverlay').fadeOut(function(){
+                    $('#editor').remove();
+                    self.popupMessage("Your post was updated! :D");
+                    $post.children('p.thing').each(function(index){
+                        $(this).text((index + 1) + ". " + data["edit" + (index + 1)]);
+                    });
+                });
+            }
+            else{
+                console.log("Something went wrong");
+            }
+        })
+        .fail(function(d, textStatus, error) {
+            console.error("The request failed, status: " + textStatus + ", error: "+error);
+        });
     });
 };
 

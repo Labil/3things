@@ -3,7 +3,13 @@
 */
 var DatabaseHandler = function(){
     this.db_url = 'http://hakestad.io/threethings/php/db_handler.php?';
-    this.admin_url = 'http://hakestad.io/threethings/php/admin.php?'
+    this.admin_url = 'http://hakestad.io/threethings/php/admin.php?';
+    this.user = null;
+    this.viewUser = null;
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var date = d.getDate();
+    this.today = d.getFullYear() + "-" + (month.length == 1 ? month : ("0" + month)) + "-" + (date.length == 1 ? date : ("0" + date)); //Y-M-D
 };
 
 DatabaseHandler.prototype.init = function(config){
@@ -11,13 +17,8 @@ DatabaseHandler.prototype.init = function(config){
     this.container = config.container;
     this.loggedInMenu = config.loggedInMenu;
     this.loggedOutMenu = config.loggedOutMenu;
-    this.user = null;
-    this.viewUser = null;
-
-    var d = new Date();
-    var month = d.getMonth() + 1;
-    var date = d.getDate();
-    this.today = d.getFullYear() + "-" + (month.length == 1 ? month : ("0" + month)) + "-" + (date.length == 1 ? date : ("0" + date)); //Y-M-D
+    this.editorTemplate = config.editorTemplate;
+    
     //this.setupScrollHandler();
     this.loadPage();
     this.setupLoginButton();
@@ -67,10 +68,10 @@ DatabaseHandler.prototype.loadPage = function(){
                     };
                 });
                 self.attachTemplate();
+                //Hack, just to be somewhat sure the posts are loaded 
                 setTimeout(function(){
                     self.enableEditPosts();    
                 }, 1000);
-                
             }
         })
         .fail(function(d, textStatus, error){
@@ -117,31 +118,6 @@ DatabaseHandler.prototype.disableEditPosts = function(){
 DatabaseHandler.prototype.enableEditPosts = function(){
     var self = this;
    //Filters out the post that has today's date and belongs to logged in user.
-   //When user clicks on items in the post, exchange text with input fields containing the text for edit or no text if empty field
-    /*$('.posts').filter(function(index){
-        var $post = $(this);
-        return ($post.data('user') == self.user && $post.data('date') == "2014-05-01");
-    }).children('p.thing').each(function(index){
-        var $p = $(this);
-        console.log($p.parent().data('id'));
-        $p.css("cursor", "pointer");
-        $p.on('click', function(){
-            var txt = $p.text().trim().replace(/[0-9]\. /, "");
-            $p.replaceWith('<p class="thing-edit">' + (index + 1) + '. </p>' +
-                '<input id="' + (index + 1) + '" class="input-post" type="text" value="' + txt +'"" />');
-
-            var input = $('input#' + (index + 1));
-
-            input.focus(function(){
-                console.log('in ' + this.id);
-            }).blur(function(){
-                console.log('out' + this.id);
-            });
-
-            input.focus();
-
-        });*/
-
     $('.posts').filter(function(index){
         var $post = $(this);
         return ($post.data('user') == self.user && $post.data('date') == self.today);
@@ -151,37 +127,29 @@ DatabaseHandler.prototype.enableEditPosts = function(){
         $post.children('p.thing').each(function(index){
             var $p = $(this);
             var txt = $p.text().replace(/[0-9]\./, "").trim();
-            console.log(txt);
-            texts[index] = txt;
+            texts[index] = {
+                'textnum' : (index + 1),
+                'text' : txt
+            };
         });
         self.spawnEditor($post, texts);
     });
 };
 
 DatabaseHandler.prototype.spawnEditor = function($post, texts){
-    var markup = [
-        '<div id="dialogOverlay">' +
-            '<div id ="editor">' +
-                '<p class="date">' + $post.data('date') + '</p>' +
-                '<form id="edit-form" action="">' +
-                    '<p class="thing-edit">1. </p>' +
-                    '<input id="edit1" class="input-post" type="text" value="' + texts[0] +'" />' +
-                    '<p class="thing-edit">2. </p>' +
-                    '<input id="edit2" class="input-post" type="text" value="' + texts[1] +'" />' +
-                    '<p class="thing-edit">3. </p>' +
-                    '<input id="edit3" class="input-post" type="text" value="' + texts[2] +'" />' +
-                    '<button type="submit" id="edit-form-submit">Save</button>' +
-                '</form>' +
-            '</div>' +
-        '</div>'
-    ].join('');
-
-    $(markup).hide().appendTo('body').fadeIn();
+    var self = this;
+    console.log($post.data('id'));
+    var templateData = {
+        'date' : $post.data('date'),
+        'texts' : texts,
+        'postId' : $post.data('id')
+    }
+    var template = Handlebars.compile(this.editorTemplate);
+    $('body').append(template(templateData));
     $('#editor').center();
 
     var form = $('#edit-form');
-    var self = this;
-    var postId = $post.data('id');
+    var postId = form.data('id');
 
     form.submit(function(e){
         e.preventDefault();
@@ -400,98 +368,6 @@ DatabaseHandler.prototype.toggleUserMenu = function(loggedIn){
 
 DatabaseHandler.prototype.popupMessage = function(message){
     $.popupbox({
-        'message'   : message
+        'message': message
     });
 };
-
-/*************************** Extra functions, should be moved ****************************/
-function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-};
-
-function rainbow(sat, light) {
-  // 30 random hues with step of 12 degrees
-  var hue = Math.floor(Math.random() * 30) * 12;
-
-    return $.Color({
-        hue: hue,
-        saturation: sat,
-        lightness: light,
-        alpha: 1
-    }).toHexString();
-};
-
-function get_random_color() {
-    var letters = 'ABCDE'.split('');
-    var color = '#';
-    for (var i=0; i<3; i++ ) {
-        color += letters[Math.floor(Math.random() * letters.length)];
-    }
-    return color;
-}
-
-
-/*DatabaseHandler.prototype.handleContactForm = function(button, form, feedback){
-    var self = this;
-    button.on('click', function(e){
-        e.preventDefault();
-        //couldn't get form.serialize() to work for some reason
-        var data = {
-            'name':$('#name').val(),
-            'email':$('#email').val(),
-            'message':$('#message').val()
-        }
-        $.post("php/process_contact_form.php", data, function(response){
-            feedback.html(response.msg);
-            feedback.slideDown(400);
-            if(response.status == "OK"){
-                button.attr('disabled','disabled');
-                self.clearFormFields();
-            }
-            setTimeout(function(){
-                feedback.slideUp(400);
-            }, 4000);
-        })
-        .fail(function(d, textStatus, error){
-            console.error("Sending form failed, status: " + textStatus + ", error: " + error);
-        });
-    });
-};
-
-DatabaseHandler.prototype.clearFormFields = function(){
-    $('#name').val('');
-    $('#email').val('');
-    $('#message').val('');
-};
-
-DatabaseHandler.prototype.setupScrollHandler = function(){
-    var self = this;
-    var toTopVisible = false;
-
-    $(window).scroll(function(event){
-        var scrollTop = $(window).scrollTop();
-        if(scrollTop > 300 && toTopVisible == false){
-            self.toggleScrollToTop();
-            toTopVisible = true;
-        }
-        else if(scrollTop < 100 && toTopVisible == true){
-            self.toggleScrollToTop();
-            toTopVisible = false;
-        }
-    });
-};
-
-DatabaseHandler.prototype.toggleScrollToTop = function(){
-    if($.backToTopButton({
-        'message' : 'Back to top?',
-        'bottom' : 10,
-        'left' : 5 
-    }) == false){
-        $.backToTopButton.hide();
-    }
-};*/

@@ -87,6 +87,22 @@
 			<p>followers TODO</p>
 		</div>
 
+		<!--Template for the post edit popup -->
+		<script id="editor-template" type="text/x-handlebars-template">
+			<div id="dialogOverlay">
+				<div id="editor">
+					<p class="date">{{date}}</p>
+					<form id="edit-form" data-id={{postId}} action="">
+						{{#each texts}}
+							<p class="thing-edit">{{textnum}}. </p>
+							<input id="edit{{textnum}}" class="input-post" type="text" value="{{text}}" />
+						{{/each}}
+						<button type="submit" id="edit-form-submit">Save</button>
+					</form>
+				</div>
+			</div>	
+		</script>
+
 		<script>
 			(function(){
 
@@ -109,7 +125,8 @@
 						'container':$('#content'),
 						'template':$('#posts-template').html(),
 						'loggedInMenu': $('#logged-in-menu'),
-						'loggedOutMenu':$('#logged-out-menu')
+						'loggedOutMenu':$('#logged-out-menu'),
+						'editorTemplate': $('#editor-template').html()
 					});
 				}
 			})();

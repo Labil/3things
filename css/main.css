@@ -49,6 +49,26 @@ p.logo{
 	float: left;
 }
 
+#page-info{
+	display: inline-block;
+	width: auto;
+	height: auto;
+	margin-left: 200px;
+}
+
+button.follow{
+	display: inline-block;
+}
+
+h1.userProfile{
+	font-family: Arial;
+	display: inline-block;
+	margin: 0;
+	padding:0;
+	margin-top: 5px;
+	margin-right: 10px;
+}
+
 #user-menu{
 	position: absolute;
 	display: inline-block;

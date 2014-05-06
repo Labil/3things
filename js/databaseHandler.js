@@ -13,17 +13,17 @@ var DatabaseHandler = function(){
 };
 
 DatabaseHandler.prototype.init = function(config){
-    this.template = config.template;
-    this.container = config.container;
-    this.loggedInMenu = config.loggedInMenu;
-    this.loggedOutMenu = config.loggedOutMenu;
+
+    this.postsTemplate = config.postsTemplate;
+    this.postsContainer = config.postsContainer;
+    this.pageInfoTemplate = config.pageInfoTemplate;
+    this.pageInfoContainer = config.pageInfoContainer;
+    this.userMenuTemplate = config.userMenuTemplate;
+    this.userMenuContainer = config.userMenuContainer;
     this.editorTemplate = config.editorTemplate;
     
     //this.setupScrollHandler();
     this.loadPage();
-    this.setupLoginButton();
-    this.setupSignupButton();
-    this.setupLogoutButton();
     this.updatePage();
 };
 
@@ -67,7 +67,7 @@ DatabaseHandler.prototype.loadPage = function(){
                         heart: heartIconSrc
                     };
                 });
-                self.attachTemplate();
+                self.attachPostsTemplate();
                 //Hack, just to be somewhat sure the posts are loaded 
                 setTimeout(function(){
                     self.enableEditPosts();    
@@ -82,10 +82,30 @@ DatabaseHandler.prototype.loadPage = function(){
     }
 };
 
-DatabaseHandler.prototype.attachTemplate = function(){
-    var template = Handlebars.compile(this.template);
-    this.container.append(template(this.result));
+DatabaseHandler.prototype.attachPostsTemplate = function(){
+    var template = Handlebars.compile(this.postsTemplate);
+    this.postsContainer.append(template(this.result));
 };
+
+DatabaseHandler.prototype.attachPageInfoTemplate = function(){
+    this.pageInfoContainer.html('');
+    var data = {
+        'user' : this.user,
+        'userProfile': this.viewUser
+    };
+    var template = Handlebars.compile(this.pageInfoTemplate);
+    this.pageInfoContainer.append(template(data));
+};
+
+DatabaseHandler.prototype.attachUserMenuTemplate = function(){
+    this.userMenuContainer.html('');
+    var data = {
+        'user' : this.user
+    };
+    var template = Handlebars.compile(this.userMenuTemplate);
+    this.userMenuContainer.append(template(data));
+};
+
 
 //This function handles what should be displayed in the menues and such.
 DatabaseHandler.prototype.updatePage = function(){
@@ -93,12 +113,17 @@ DatabaseHandler.prototype.updatePage = function(){
     $.getJSON(this.admin_url + 'req=checkLoggedIn', function(data){
         if(data.logged_in == 'YES'){
             self.user = data.username;
-            self.toggleUserMenu(true);
+            self.attachPageInfoTemplate();
+            self.attachUserMenuTemplate();
+            self.setupLogoutButton();
             return true;
         }
         else{
             self.user = null;
-            self.toggleUserMenu(false);
+            self.attachPageInfoTemplate();
+            self.attachUserMenuTemplate();
+            self.setupLoginButton();
+            self.setupSignupButton();
             self.disableEditPosts();
             return false;
         }
@@ -350,20 +375,6 @@ DatabaseHandler.prototype.signUp = function(username, password){
             }
         });
     });
-};
-
-DatabaseHandler.prototype.toggleUserMenu = function(loggedIn){
-    if(loggedIn){
-        this.loggedOutMenu.hide();
-        this.loggedInMenu.find('p').remove();
-        this.loggedInMenu.prepend('<a href="http://hakestad.io/threethings/?user=' + this.user + '"><p class="userGreeting">Hi, ' + this.user + '!</p></a>' );
-        this.loggedInMenu.show();
-
-    }
-    else{
-        this.loggedInMenu.hide();
-        this.loggedOutMenu.show();
-    }
 };
 
 DatabaseHandler.prototype.popupMessage = function(message){

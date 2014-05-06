@@ -21,6 +21,17 @@
 			<div id="about">
 			</div>
 
+			<div id="page-info">
+				<script id="page-info-template" type="text/x-handlebars-template">
+					{{#if userProfile}}
+						<h1 class="userProfile">{{userProfile}}s profile</h1>
+					{{/if}}
+					{{#if user}}
+						<button class="follow" data-user="{{userProfile}}">Follow</button>
+					 {{/if}}
+				</script>
+			</div>
+
 			<div class="outer-center">
 					<div id="logo" class="inner-center">
 						<h4 class="logo">3 things.</h4>
@@ -29,15 +40,15 @@
 			
 
 			<div id="user-menu">
-				<span id="logged-in-menu">
-					<p>Welcomemessage</p>
-					<button id="logout">Log out</button>
-				</span>
-
-				<span id="logged-out-menu">
-					<button id="login">Log in</button>
-					<button id="signup">Sign up</button>
-				</span>
+				<script id="user-menu-template" type="text/x-handlebars-template">
+					{{#if user}}
+						<a href="http://hakestad.io/threethings/?user={{user}}"><p class="userGreeting">Hi, {{user}}!</p></a>
+						<button id="logout">Log out</button>
+					{{else}}
+						<button id="login">Log in</button>
+						<button id="signup">Sign up</button>
+					{{/if}}
+				</script>
 			</div>
 			<div class="clear"></div>
 		</div><!--end of header-->
@@ -122,10 +133,12 @@
 					});
 					var databaseMgr = new DatabaseHandler();
 					databaseMgr.init({
-						'container':$('#content'),
-						'template':$('#posts-template').html(),
-						'loggedInMenu': $('#logged-in-menu'),
-						'loggedOutMenu':$('#logged-out-menu'),
+						'postsTemplate':$('#posts-template').html(),
+						'postsContainer':$('#content'),
+						'pageInfoTemplate': $('#page-info-template').html(),
+						'pageInfoContainer' : $('#page-info'),
+						'userMenuTemplate':$('#user-menu-template').html(),
+						'userMenuContainer': $('#user-menu'),
 						'editorTemplate': $('#editor-template').html()
 					});
 				}

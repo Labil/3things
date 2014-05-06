@@ -22,7 +22,6 @@ DatabaseHandler.prototype.init = function(config){
     this.userMenuContainer = config.userMenuContainer;
     this.editorTemplate = config.editorTemplate;
     
-    //this.setupScrollHandler();
     this.loadPage();
     this.updatePage();
 };
@@ -34,6 +33,10 @@ DatabaseHandler.prototype.loadPage = function(){
     //If there's no query for a person, then load startpage
     if(query == null || query ==''){
         console.log("Should load start page");
+        this.result = {
+            'shouldDisplayWelcomePage' : true
+        };
+        this.attachPostsTemplate();
     }
     else{
         //Get the name that comes after the ?user= in the search parameters in the link
@@ -68,15 +71,15 @@ DatabaseHandler.prototype.loadPage = function(){
                     };
                 });
                 self.attachPostsTemplate();
-                //Hack, just to be somewhat sure the posts are loaded 
-                setTimeout(function(){
-                    self.enableEditPosts();    
-                }, 1000);
             }
         })
         .fail(function(d, textStatus, error){
             //If error, should load start page or 404 page
             console.log("Should load start page?");
+            this.result = {
+                'shouldDisplayWelcomePage' : true
+            };
+            self.attachPostsTemplate();
             console.error("getJSON failed, status: " + textStatus + ", error: "+error);
         });
     }
@@ -116,6 +119,7 @@ DatabaseHandler.prototype.updatePage = function(){
             self.attachPageInfoTemplate();
             self.attachUserMenuTemplate();
             self.setupLogoutButton();
+            self.enableEditPosts();
             return true;
         }
         else{
@@ -135,18 +139,22 @@ DatabaseHandler.prototype.updatePage = function(){
     });
 };
 
-//TODO
 DatabaseHandler.prototype.disableEditPosts = function(){
     console.log("Disabling edit posts");
+     var self = this;
+    //Removes the pointer cursor, click listener and turning off edit possibilities
+     $('.editable-post').css("cursor", "default").off().removeClass('editable-post');
 };
 
 DatabaseHandler.prototype.enableEditPosts = function(){
     var self = this;
    //Filters out the post that has today's date and belongs to logged in user.
+   //Add a class to indicate that this post can be edited, thus making it easier to find when I wanna turn editing off
+   //when user logges out
     $('.posts').filter(function(index){
         var $post = $(this);
         return ($post.data('user') == self.user && $post.data('date') == self.today);
-    }).css("cursor", "pointer").on('click', function(){
+    }).css("cursor", "pointer").addClass('editable-post').on('click', function(){
         var $post = $(this);
         var texts = [3];
         $post.children('p.thing').each(function(index){
@@ -163,7 +171,6 @@ DatabaseHandler.prototype.enableEditPosts = function(){
 
 DatabaseHandler.prototype.spawnEditor = function($post, texts){
     var self = this;
-    console.log($post.data('id'));
     var templateData = {
         'date' : $post.data('date'),
         'texts' : texts,
@@ -361,8 +368,6 @@ DatabaseHandler.prototype.signUp = function(username, password){
     $.getJSON(this.admin_url + "req=signup", data, function(response){
         console.log(response.logged_in + ", " + response.username);
         self.popupMessage("You are now signed up and logged in. Woo =)");
-        
-        
     })
     .done(function(){
         $.getJSON(self.db_url + "req=insertFirstPost", {'user':username}, function(response){

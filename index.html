@@ -25,10 +25,11 @@
 				<script id="page-info-template" type="text/x-handlebars-template">
 					{{#if userProfile}}
 						<h1 class="userProfile">{{userProfile}}s profile</h1>
+						{{#if user}}
+							<button class="follow" data-user="{{userProfile}}">Follow</button>
+						 {{/if}}
 					{{/if}}
-					{{#if user}}
-						<button class="follow" data-user="{{userProfile}}">Follow</button>
-					 {{/if}}
+					
 				</script>
 			</div>
 
@@ -59,26 +60,33 @@
 		<div id="content">
 			<script id="posts-template" type="text/x-handlebars-template">
 				<div id="posts-container">
-					{{#each this}}
-						<div id="{{id}}" class="posts" data-user="{{user}}" data-date="{{date}}" data-id="{{id}}" style="border: 2px solid {{colorOutline}};">
-							<p class="date">
-								{{date}}
-							</p>
-							<p class="thing" style="background-color:{{color1}};">
-								1. {{thing1}}
-							</p>
-							<p class="thing" style="background-color:{{color2}};">
-								2. {{thing2}}
-							</p>
-							<p class="thing" style="background-color:{{color3}};">
-								3. {{thing3}}
-							</p>
-							<div class="heart">
-								<p class="like">{{likes}}</p>
-								<img class="hearticon" width="20" height="17" src="{{heart}}" /> 
-							</div>							
-						</div>
-					{{/each}}
+					{{#if shouldDisplayWelcomePage}}
+						<h1>Welcome to the best micro-blog for positive thinking!</h1>
+						<p>(Yes, the competition is slim...)</p>
+						<p>Sign up or log in to start blogging, or find users with the search function.</p>
+						<p>Have an awesome day!</p>
+					{{else}}
+						{{#each this}}
+							<div id="{{id}}" class="posts" data-user="{{user}}" data-date="{{date}}" data-id="{{id}}" style="border: 2px solid {{colorOutline}};">
+								<p class="date">
+									{{date}}
+								</p>
+								<p class="thing" style="background-color:{{color1}};">
+									1. {{thing1}}
+								</p>
+								<p class="thing" style="background-color:{{color2}};">
+									2. {{thing2}}
+								</p>
+								<p class="thing" style="background-color:{{color3}};">
+									3. {{thing3}}
+								</p>
+								<div class="heart">
+									<p class="like">{{likes}}</p>
+									<img class="hearticon" width="20" height="17" src="{{heart}}" /> 
+								</div>							
+							</div>
+						{{/each}}
+					{{/if}}
 				</div>	
 			</script>
 				

@@ -176,7 +176,7 @@ DatabaseHandler.prototype.spawnEditor = function($post, texts){
     }
     var template = Handlebars.compile(this.editorTemplate);
     $('body').append(template(templateData));
-    $('#editor').center();
+    $('#editor').centerHigh();
 
     var form = $('#edit-form');
     var postId = form.data('id');

@@ -200,6 +200,24 @@ p.thing, p.thing-edit{
 p.thing-edit{
 	display: inline-block;
 	margin-top: 0;
+	padding-right: 0;
+}
+
+p.charactersLeft{
+	font-family: Arial, sans-serif;
+	font-size: 0.7em;
+	padding: 0;
+	margin: 0;
+}
+
+input.charactersLeft{
+	border: none;
+	width: 15px;
+	height: auto;
+	padding: 0;
+	margin: 0;
+	margin-bottom: 5px;
+	display: inline-block;
 }
 
 input.input-post{

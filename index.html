@@ -114,9 +114,12 @@
 					<p class="date">{{date}}</p>
 					<form id="edit-form" data-id={{postId}} action="">
 						{{#each texts}}
-							<p class="thing-edit">{{textnum}}. </p>
-							<input id="edit{{textnum}}" class="input-post" type="text" value="{{text}}" />
+							<p class="thing-edit">{{textnum}}.</p>
+							<input name="input{{textnum}}" id="edit{{textnum}}" class="input-post" type="text" 
+								onKeyDown="limitText(this.form.input{{textnum}}, this.form.countdown, 40);"
+								onKeyUp="limitText(this.form.input{{textnum}}, this.form.countdown, 40);" maxlength="40" value="{{text}}" />
 						{{/each}}
+						<p class="charactersLeft">You have <input class="charactersLeft" readonly type="text" name="countdown" value="40"> characters left.</p>
 						<button type="submit" id="edit-form-submit">Save</button>
 					</form>
 				</div>

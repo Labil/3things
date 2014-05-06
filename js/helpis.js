@@ -30,6 +30,13 @@ $.fn.center = function () {
     return this;
 }
 
+$.fn.centerHigh = function () {
+    this.css("position","fixed");
+    this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 3)) + "px");
+    this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2)) + "px");
+    return this;
+}
+
 /* User can specify displacement either from (default)top/left, top/right, bottom/left, bottom/right
    Only if first two params is null (or no value sent in), then bottom and right will be used. 
    @fixed decides position type fixed instead of default absolute */
@@ -107,4 +114,13 @@ function get_random_color() {
         color += letters[Math.floor(Math.random() * letters.length)];
     }
     return color;
+}
+
+//Stolen from http://www.mediacollege.com/internet/javascript/form/limit-characters.html
+function limitText(limitField, limitCount, limitNum) {
+    if (limitField.value.length > limitNum) {
+        limitField.value = limitField.value.substring(0, limitNum);
+    } else {
+        limitCount.value = limitNum - limitField.value.length;
+    }
 }

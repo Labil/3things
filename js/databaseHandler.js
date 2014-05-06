@@ -32,7 +32,6 @@ DatabaseHandler.prototype.loadPage = function(){
 
     //If there's no query for a person, then load startpage
     if(query == null || query ==''){
-        console.log("Should load start page");
         this.result = {
             'shouldDisplayWelcomePage' : true
         };
@@ -40,42 +39,51 @@ DatabaseHandler.prototype.loadPage = function(){
     }
     else{
         //Get the name that comes after the ?user= in the search parameters in the link
-        var username = query.match(/user=(.+)/)[1];
-        self.viewUser = username;
+        //var username = query.match(/user=(.+)/)[1];
+        var username = query.substr(6);
         var colOutline, heartIconSrc, col1, col2, col3;
 
         //console.log(this.db_url + 'req=fetch&user=' + username);
         $.getJSON(self.db_url + 'req=fetch&user=' + username, function(data){
             if(data.status == "OK"){
-                self.result = $.map(data.result, function(res){ 
-                    //Adding appropiate graphics and color styles to the posts
-                    res.date == self.today ? colOutline = "#9aeaed" : colOutline = "#d6d6d6";
-                    res.likes > 0 ? heartIconSrc = "assets/heart_likes.png" : heartIconSrc = "assets/heart_nolikes.png";
-                    res.thing1 == "" ? col1 = "#d6d6d6" : col1 = rainbow(1.0, 0.8);
-                    res.thing2 == "" ? col2 = "#d6d6d6" : col2 = get_random_color();
-                    res.thing3 == "" ? col3 = "#d6d6d6" : col3 = rainbow(0.8, 0.9);
+                
+                if(data.result.length > 0){
+                    //Setting viewUser when we are sure the user exist aka has posts
+                    self.viewUser = username;
+                    self.result = $.map(data.result, function(res){ 
+                        //Adding appropiate graphics and color styles to the posts
+                        res.date == self.today ? colOutline = "#9aeaed" : colOutline = "#d6d6d6";
+                        res.likes > 0 ? heartIconSrc = "assets/heart_likes.png" : heartIconSrc = "assets/heart_nolikes.png";
+                        res.thing1 == "" ? col1 = "#d6d6d6" : col1 = rainbow(1.0, 0.8);
+                        res.thing2 == "" ? col2 = "#d6d6d6" : col2 = get_random_color();
+                        res.thing3 == "" ? col3 = "#d6d6d6" : col3 = rainbow(0.8, 0.9);
 
-                    return {
-                        id: res.id,
-                        user: res.user,
-                        date: res.date,
-                        thing1: res.thing1,
-                        thing2: res.thing2,
-                        thing3: res.thing3,
-                        likes: res.likes,
-                        color1: col1,
-                        color2: col2,
-                        color3: col3,
-                        colorOutline: colOutline,
-                        heart: heartIconSrc
+                        return {
+                            id: res.id,
+                            user: res.user,
+                            date: res.date,
+                            thing1: res.thing1,
+                            thing2: res.thing2,
+                            thing3: res.thing3,
+                            likes: res.likes,
+                            color1: col1,
+                            color2: col2,
+                            color3: col3,
+                            colorOutline: colOutline,
+                            heart: heartIconSrc
+                        };
+                    });
+                }
+                else{
+                    self.result = {
+                        'shouldDisplayNoUserFound' : true
                     };
-                });
+                }
                 self.attachPostsTemplate();
             }
         })
         .fail(function(d, textStatus, error){
             //If error, should load start page or 404 page
-            console.log("Should load start page?");
             this.result = {
                 'shouldDisplayWelcomePage' : true
             };
@@ -119,6 +127,7 @@ DatabaseHandler.prototype.updatePage = function(){
             setTimeout(function(){
                 self.setupLogoutButton();
                 self.enableEditPosts();
+                self.enableLikes();
             }, 500);
         }
         else{
@@ -127,6 +136,7 @@ DatabaseHandler.prototype.updatePage = function(){
                 self.setupLoginButton();
                 self.setupSignupButton();
                 self.disableEditPosts();
+                self.disableLikes();
             }, 500);
         }
         self.attachPageInfoTemplate();
@@ -137,9 +147,51 @@ DatabaseHandler.prototype.updatePage = function(){
     });
 };
 
+DatabaseHandler.prototype.enableLikes = function(){
+    var self = this;
+    //first, remove all listeners
+    $('.heart').off();
+    if(this.viewUser != this.user){
+        $('.heart').on('click', function(){
+            $this = $(this);
+            var postId = $this.data('id');
+            var data = {
+                'user' : self.user,
+                'postId': postId
+            };
+            $.getJSON(self.db_url + 'req=like', data, function(response){
+                if(response.status == 'OK'){
+                    var p = $this.find('p.like');
+                    var numLikes = parseInt(p.text());
+                    var newNumLikes = numLikes + 1;
+                    p.text(newNumLikes);
+                    $this.find('img.hearticon').attr("src", "assets/heart_likes.png");
+                }
+                else{
+                    self.popupMessage('Chill on the likes, you\'ve already hit that one.');
+                }
+            });
+        });    
+    }
+    else if(this.viewUser == this.user){
+        $('.heart').on('click', function(){
+            self.popupMessage('Sorry, you can\'t favorite your own posts!');
+        });
+    }
+};
+
+DatabaseHandler.prototype.disableLikes = function(){
+    var self = this;
+    //first, remove all listeners
+    $('.heart').off();
+    if(this.user == null){
+        $('.heart').on('click', function(){
+            self.popupMessage('You must be logged in to favorite posts!');
+        });
+    }
+};    
+
 DatabaseHandler.prototype.disableEditPosts = function(){
-    console.log("Disabling edit posts");
-     var self = this;
     //Removes the pointer cursor, click listener and turning off edit possibilities
      $('.editable-post').css("cursor", "default").off().removeClass('editable-post');
 };
@@ -200,11 +252,12 @@ DatabaseHandler.prototype.spawnEditor = function($post, texts){
                 $('#editor').remove();
                 self.popupMessage("Your post was updated! :D");
                 $post.children('p.thing').each(function(index){
-                    $(this).text((index + 1) + ". " + data["edit" + (index + 1)]);
+                    var t = data["edit" + (index + 1)];
+                    var $this = $(this);
+                    $this.text((index + 1) + ". " + data["edit" + (index + 1)]);
+                    if(t != '')
+                        $this.css('background-color', get_random_color());
                 });
-            }
-            else{
-                console.log("Something went wrong");
             }
         })
         .fail(function(d, textStatus, error) {
@@ -262,7 +315,6 @@ DatabaseHandler.prototype.checkLogin = function(username, password){
         'p' : password
     };
     $.getJSON(self.admin_url + "req=login", data, function(response) {
-        console.log(response.logged_in);
         if(response.logged_in == 'YES'){
             self.popupMessage(successMsg);
             self.updatePage();
@@ -350,7 +402,6 @@ DatabaseHandler.prototype.setupSignupButton = function(){
 DatabaseHandler.prototype.logout = function(){
     var self = this;
     $.getJSON(this.admin_url + "req=logout", function(response) {
-        console.log(response.status);
         if(response.status == "OK"){
             self.popupMessage("You successfully logged out! Good job.");
             self.updatePage();
@@ -369,13 +420,12 @@ DatabaseHandler.prototype.signUp = function(username, password){
         'p' : password
     };
     $.getJSON(this.admin_url + "req=signup", data, function(response){
-        console.log(response.logged_in + ", " + response.username);
+        //console.log(response.logged_in + ", " + response.username);
         self.popupMessage("You are now signed up and logged in. Woo =)");
     })
     .done(function(){
         $.getJSON(self.db_url + "req=insertFirstPost", {'user':username}, function(response){
             if(response.status == 'OK'){
-                console.log("Inserted");
 
                 setTimeout(function(){
                     location.search = '?user=' + username; 

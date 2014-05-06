@@ -69,7 +69,7 @@
         ].join('');
 
         $(markup).hide().appendTo('body').fadeIn();
-        $('#popupBox').center();
+        $('#popupBox').centerHigh();
 
         setTimeout(function(){
             $.popupbox.hide();

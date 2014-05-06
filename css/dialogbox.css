@@ -21,7 +21,7 @@
 #dialogBox p{
     font-size:20px;
     line-height:1.4;
-    font-family:; 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    font-family: 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
     padding: 10px;
     padding-top: 35px;
     padding-left: 30px;
@@ -50,7 +50,7 @@
 /******************** Popup ******************************/
 
 #popupBox{
-    background-color:#3498DB;
+    background-color:#01BDFF;
     width:auto;
     position:fixed;
     left:50%;
@@ -62,7 +62,7 @@
 #popupBox p{
     font-size:20px;
     line-height:1.4;
-    font-family:; 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    font-family: 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
     padding: 10px 25px 9px 25px;
     color:white;
 }
@@ -80,14 +80,14 @@
 #tipBox p{
     font-size:18px;
     line-height:1.4;
-    font-family:; 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    font-family: 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
     color:white;
 }
 
 #tipBox h2{
     font-size:20px;
     line-height:1.4;
-    font-family:; 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    font-family: 'Cuprum','Lucida Sans Unicode', 'Lucida Grande', sans-serif;
     color:white;
     padding-top: 10px;
     padding-bottom: 10px;

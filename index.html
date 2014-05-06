@@ -66,26 +66,31 @@
 						<p>Sign up or log in to start blogging, or find users with the search function.</p>
 						<p>Have an awesome day!</p>
 					{{else}}
-						{{#each this}}
-							<div id="{{id}}" class="posts" data-user="{{user}}" data-date="{{date}}" data-id="{{id}}" style="border: 2px solid {{colorOutline}};">
-								<p class="date">
-									{{date}}
-								</p>
-								<p class="thing" style="background-color:{{color1}};">
-									1. {{thing1}}
-								</p>
-								<p class="thing" style="background-color:{{color2}};">
-									2. {{thing2}}
-								</p>
-								<p class="thing" style="background-color:{{color3}};">
-									3. {{thing3}}
-								</p>
-								<div class="heart">
-									<p class="like">{{likes}}</p>
-									<img class="hearticon" width="20" height="17" src="{{heart}}" /> 
-								</div>							
-							</div>
-						{{/each}}
+						{{#if shouldDisplayNoUserFound}}
+							<h1>404: Sorry, the user was not found.</h1>
+							<h2>Create user? (todo: add link til signup)</h2>
+						{{else}}
+							{{#each this}}
+								<div id="{{id}}" class="posts" data-user="{{user}}" data-date="{{date}}" data-id="{{id}}" style="border: 2px solid {{colorOutline}};">
+									<p class="date">
+										{{date}}
+									</p>
+									<p class="thing" style="background-color:{{color1}};">
+										1. {{thing1}}
+									</p>
+									<p class="thing" style="background-color:{{color2}};">
+										2. {{thing2}}
+									</p>
+									<p class="thing" style="background-color:{{color3}};">
+										3. {{thing3}}
+									</p>
+									<div class="heart" data-id="{{id}}">
+										<p class="like">{{likes}}</p>
+										<img class="hearticon" width="20" height="17" src="{{heart}}" /> 
+									</div>							
+								</div>
+							{{/each}}
+						{{/if}}
 					{{/if}}
 				</div>	
 			</script>

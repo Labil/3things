@@ -109,33 +109,31 @@ DatabaseHandler.prototype.attachUserMenuTemplate = function(){
     this.userMenuContainer.append(template(data));
 };
 
-
 //This function handles what should be displayed in the menues and such.
 DatabaseHandler.prototype.updatePage = function(){
     var self = this;
     $.getJSON(this.admin_url + 'req=checkLoggedIn', function(data){
         if(data.logged_in == 'YES'){
             self.user = data.username;
-            self.attachPageInfoTemplate();
-            self.attachUserMenuTemplate();
-            self.setupLogoutButton();
-            self.enableEditPosts();
-            return true;
+            //Hack to make sure posts are loaded, since handlebars doesn't have a good callback system that I could find atm
+            setTimeout(function(){
+                self.setupLogoutButton();
+                self.enableEditPosts();
+            }, 500);
         }
         else{
             self.user = null;
-            self.attachPageInfoTemplate();
-            self.attachUserMenuTemplate();
-            self.setupLoginButton();
-            self.setupSignupButton();
-            self.disableEditPosts();
-            return false;
+            setTimeout(function(){
+                self.setupLoginButton();
+                self.setupSignupButton();
+                self.disableEditPosts();
+            }, 500);
         }
+        self.attachPageInfoTemplate();
+        self.attachUserMenuTemplate();
     })
     .fail(function(d, textStatus, error){
         console.error("Checking if logged in failed in admin.php, status: " + textStatus + ", error: "+error);
-        self.toggleUserMenu(false);
-        return false;
     });
 };
 
@@ -183,6 +181,12 @@ DatabaseHandler.prototype.spawnEditor = function($post, texts){
     var form = $('#edit-form');
     var postId = form.data('id');
 
+    $('.editCancel').on('click', function(e){
+        e.preventDefault();
+        $('#dialogOverlay').remove();
+        $('#editor').remove();
+    });
+
     form.submit(function(e){
         e.preventDefault();
         var data = {
@@ -192,12 +196,11 @@ DatabaseHandler.prototype.spawnEditor = function($post, texts){
         };
         $.post(self.db_url + "req=edit&postId=" + postId, data, function(response){
             if(response.status == "OK") {
-                $('#dialogOverlay').fadeOut(function(){
-                    $('#editor').remove();
-                    self.popupMessage("Your post was updated! :D");
-                    $post.children('p.thing').each(function(index){
-                        $(this).text((index + 1) + ". " + data["edit" + (index + 1)]);
-                    });
+                $('#dialogOverlay').remove()
+                $('#editor').remove();
+                self.popupMessage("Your post was updated! :D");
+                $post.children('p.thing').each(function(index){
+                    $(this).text((index + 1) + ". " + data["edit" + (index + 1)]);
                 });
             }
             else{

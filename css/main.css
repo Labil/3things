@@ -67,14 +67,6 @@ p.logo{
 	vertical-align: top;
 	text-align: center;
 }
-
-#logged-out-menu{
-	display: none;
-}
-
-#logged-in-menu{
-	display: none;
-}
 /*Because header is fixed it doesn't take up space of the page. Need an (empty)
 element the size of the header to push the rest of the content down */ 
 #contentPush {
@@ -154,6 +146,17 @@ img.hearticon{
     text-align: center;
     color: white;
     font-size: 1.5em;
+}
+
+.editCancel{
+	position: absolute;
+	cursor: pointer;
+	color: #282828;
+	font-family: sans-serif;
+	font-size: 1em;
+	float: right;
+	top: 10px;
+	right: 20px;
 }
 
 p.footer{

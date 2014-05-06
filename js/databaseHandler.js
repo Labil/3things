@@ -6,6 +6,8 @@ var DatabaseHandler = function(){
     this.admin_url = 'http://hakestad.io/threethings/php/admin.php?';
     this.user = null;
     this.viewUser = null;
+    this.followers = {};
+    this.following = {};
     var d = new Date();
     var month = d.getMonth() + 1;
     var date = d.getDate();
@@ -13,7 +15,6 @@ var DatabaseHandler = function(){
 };
 
 DatabaseHandler.prototype.init = function(config){
-
     this.postsTemplate = config.postsTemplate;
     this.postsContainer = config.postsContainer;
     this.pageInfoTemplate = config.pageInfoTemplate;
@@ -21,6 +22,10 @@ DatabaseHandler.prototype.init = function(config){
     this.userMenuTemplate = config.userMenuTemplate;
     this.userMenuContainer = config.userMenuContainer;
     this.editorTemplate = config.editorTemplate;
+    this.followingTemplate = config.followingTemplate;
+    this.followingContainer = config.followingContainer;
+    this.followersTemplate = config.followersTemplate;
+    this.followersContainer = config.followersContainer;
     
     this.loadPage();
     this.updatePage();
@@ -99,11 +104,10 @@ DatabaseHandler.prototype.attachPostsTemplate = function(){
 };
 
 DatabaseHandler.prototype.attachPageInfoTemplate = function(){
+    //console.log(this.user);
+    //console.log(this.viewUser);
     this.pageInfoContainer.html('');
-    var data = {
-        'user' : this.user,
-        'userProfile': this.viewUser
-    };
+    var data = { 'follow' : (this.user == null || this.user == this.viewUser) ? false : true, 'userProfile' : this.viewUser };
     var template = Handlebars.compile(this.pageInfoTemplate);
     this.pageInfoContainer.append(template(data));
 };
@@ -117,41 +121,59 @@ DatabaseHandler.prototype.attachUserMenuTemplate = function(){
     this.userMenuContainer.append(template(data));
 };
 
+DatabaseHandler.prototype.attachFollowers = function(){
+    this.followersContainer.html('');
+    var data = {
+        'followersArray' : this.followers
+    };
+    var template = Handlebars.compile(this.followersTemplate);
+    this.followersContainer.append(template(data));
+};
+
+DatabaseHandler.prototype.attachFollowing = function(){
+    this.followingContainer.html('');
+    var data = {
+        'followingArray' : this.following
+    };
+    var template = Handlebars.compile(this.followingTemplate);
+    this.followingContainer.append(template(data));
+};
+
 //This function handles what should be displayed in the menues and such.
 DatabaseHandler.prototype.updatePage = function(){
     var self = this;
     $.getJSON(this.admin_url + 'req=checkLoggedIn', function(data){
-        if(data.logged_in == 'YES'){
-            self.user = data.username;
-            //Hack to make sure posts are loaded, since handlebars doesn't have a good callback system that I could find atm
-            setTimeout(function(){
-                self.setupLogoutButton();
-                self.enableEditPosts();
-                self.enableLikes();
-            }, 500);
-        }
-        else{
-            self.user = null;
-            setTimeout(function(){
-                self.setupLoginButton();
-                self.setupSignupButton();
-                self.disableEditPosts();
-                self.disableLikes();
-            }, 500);
-        }
+        if(data.logged_in == 'YES')self.user = data.username;
+        else self.user = null;
         self.attachPageInfoTemplate();
         self.attachUserMenuTemplate();
+        self.getFollowing();
+        self.getFollowers();
+        //Hack to make sure posts are loaded, since handlebars doesn't have a good callback system that I could find atm
+        setTimeout(function(){
+            self.setupLogoutButton();
+            self.setupLoginButton();
+            self.setupSignupButton();
+            self.toggleEditPosts();
+            self.toggleLikes();
+            self.toggleFollow();
+        }, 500);
     })
     .fail(function(d, textStatus, error){
         console.error("Checking if logged in failed in admin.php, status: " + textStatus + ", error: "+error);
     });
 };
 
-DatabaseHandler.prototype.enableLikes = function(){
+DatabaseHandler.prototype.toggleLikes = function(){
     var self = this;
     //first, remove all listeners
     $('.heart').off();
-    if(this.viewUser != this.user){
+    if(this.user == null){
+        $('.heart').on('click', function(){
+            self.popupMessage('You must be logged in to favorite posts!');
+        });
+    }
+    else if(this.viewUser != null && this.viewUser != this.user){
         $('.heart').on('click', function(){
             $this = $(this);
             var postId = $this.data('id');
@@ -178,45 +200,35 @@ DatabaseHandler.prototype.enableLikes = function(){
             self.popupMessage('Sorry, you can\'t favorite your own posts!');
         });
     }
-};
+};   
 
-DatabaseHandler.prototype.disableLikes = function(){
+DatabaseHandler.prototype.toggleEditPosts = function(){
     var self = this;
-    //first, remove all listeners
-    $('.heart').off();
-    if(this.user == null){
-        $('.heart').on('click', function(){
-            self.popupMessage('You must be logged in to favorite posts!');
-        });
+    //If not logged in or not viewing your own profile
+    if(this.user == null || this.user != this.viewUser){
+        //Removes the pointer cursor, click listener and turning off edit possibilities
+         $('.editable-post').css("cursor", "default").off().removeClass('editable-post');
     }
-};    
-
-DatabaseHandler.prototype.disableEditPosts = function(){
-    //Removes the pointer cursor, click listener and turning off edit possibilities
-     $('.editable-post').css("cursor", "default").off().removeClass('editable-post');
-};
-
-DatabaseHandler.prototype.enableEditPosts = function(){
-    var self = this;
-   //Filters out the post that has today's date and belongs to logged in user.
-   //Add a class to indicate that this post can be edited, thus making it easier to find when I wanna turn editing off
-   //when user logges out
-    $('.posts').filter(function(index){
-        var $post = $(this);
-        return ($post.data('user') == self.user && $post.data('date') == self.today);
-    }).css("cursor", "pointer").addClass('editable-post').on('click', function(){
-        var $post = $(this);
-        var texts = [3];
-        $post.children('p.thing').each(function(index){
-            var $p = $(this);
-            var txt = $p.text().replace(/[0-9]\./, "").trim();
-            texts[index] = {
-                'textnum' : (index + 1),
-                'text' : txt
-            };
-        });
-        self.spawnEditor($post, texts);
-    });
+    else{
+        //Filters out the post that has today's date and belongs to logged in user.
+        //Add a class to indicate that this post can be edited, thus making it easier to find when I wanna turn editing off
+         $('.posts').filter(function(index){
+             var $post = $(this);
+             return ($post.data('date') == self.today);
+         }).css("cursor", "pointer").addClass('editable-post').on('click', function(){
+             var $post = $(this);
+             var texts = [3];
+             $post.children('p.thing').each(function(index){
+                 var $p = $(this);
+                 var txt = $p.text().replace(/[0-9]\./, "").trim();
+                 texts[index] = {
+                     'textnum' : (index + 1),
+                     'text' : txt
+                 };
+             });
+             self.spawnEditor($post, texts);
+         });
+    }
 };
 
 DatabaseHandler.prototype.spawnEditor = function($post, texts){
@@ -408,7 +420,7 @@ DatabaseHandler.prototype.logout = function(){
         }
     })
     .fail(function(d, textStatus, error) {
-        self.popupMessage("Something went wrong with your request. Try again!");
+        self.popupMessage("Hmz...something went wrong. Dust yourself off and try again, try again!");
         console.error("The request failed, status: " + textStatus + ", error: "+error);
     });
 };
@@ -433,6 +445,84 @@ DatabaseHandler.prototype.signUp = function(username, password){
             }
         });
     });
+};
+
+DatabaseHandler.prototype.toggleFollow = function(){
+    var self = this;
+    //First turn off event, and only add if user is logged in and not viewing it's own profile
+    $('.follow').off();
+    if(this.user != null && this.viewUser != this.user){
+        $('.follow').on('click', function(e){
+            e.preventDefault();
+            $this = $(this);
+            var userToFollow = $this.data('profile');
+            var data = {
+                'user' : self.user,
+                'following' : userToFollow
+            };
+            self.follow(data);
+        });
+    }
+};
+
+DatabaseHandler.prototype.follow = function(data){
+    var self = this;
+    $.getJSON(self.db_url + 'req=follow', data, function(response){
+        if(response.status == 'OK'){
+            self.popupMessage('Success! You are now following ' + userToFollow);
+        }
+        else{
+            self.popupMessage('It seems you are already following that person. Like the enthusiasm, tho!');
+        }
+    })
+    .fail(function(d, textStatus, error){
+        self.popupMessage('Hmz...something went wrong. Dust yourself off and try again, try again !');
+        console.error("The request failed, status: " + textStatus + ", error: "+error);
+    });
+};
+
+DatabaseHandler.prototype.getFollowing = function(){
+    var self = this;
+    $.getJSON(self.db_url + 'req=following&user=' + this.user, function(response){
+        if(response.status == 'OK'){
+            console.log(response.result.length);
+            if(response.result.length > 0){
+                self.following = $.map(response.result, function(res){ 
+                    return {
+                        following: res.following,
+                        color: rainbow(1.0, 1.0)
+                    };
+                });
+            }
+            self.attachFollowing();
+        }
+    })
+    .fail(function(d, textStatus, error){
+        console.error("The request failed, status: " + textStatus + ", error: "+error);
+    });
+
+};
+
+DatabaseHandler.prototype.getFollowers = function(){
+    var self = this;
+    $.getJSON(self.db_url + 'req=followers&user=' + this.user, function(response){
+        if(response.status == 'OK'){
+            console.log(response.result.length);
+            if(response.result.length > 0){
+                self.followers = $.map(response.result, function(res){ 
+                    return {
+                        follower: res.follower,
+                        color: rainbow(1.0, 1.0)
+                    };
+                });
+            }
+            self.attachFollowers();
+        }
+    })
+    .fail(function(d, textStatus, error){
+        console.error("The request failed, status: " + textStatus + ", error: "+error);
+    });
+
 };
 
 DatabaseHandler.prototype.popupMessage = function(message){

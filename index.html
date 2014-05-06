@@ -25,8 +25,8 @@
 				<script id="page-info-template" type="text/x-handlebars-template">
 					{{#if userProfile}}
 						<h1 class="userProfile">{{userProfile}}s profile</h1>
-						{{#if user}}
-							<button class="follow" data-user="{{userProfile}}">Follow</button>
+						{{#if follow}}
+							<button class="follow" data-profile="{{userProfile}}">Follow</button>
 						 {{/if}}
 					{{/if}}
 					
@@ -107,8 +107,26 @@
 		<br /> 
 		<br /> 
 
-		<div id="followers">
-			<p>followers TODO</p>
+		<div id="footer">
+			
+			<div id="following">
+				<script id="following-template" type="text/x-handlebars-template">
+					<p>You are following:</p>
+					{{#each followingArray}}
+						<a href="http://hakestad.io/threethings/?user={{following}}"><p>{{following}}</p></a>
+					{{/each}}
+				</script>
+			</div>
+		
+			<div id="followers">
+				<script id="followers-template" type="text/x-handlebars-template">
+				<p>Your followers:</p>
+					{{#each followersArray}}
+						<a href="http://hakestad.io/threethings/?user={{follower}}"><p>{{follower}}</p></a>
+					{{/each}}
+				</script>
+			</div>
+			
 		</div>
 
 		<!--Template for the post edit popup -->
@@ -156,7 +174,11 @@
 						'pageInfoContainer' : $('#page-info'),
 						'userMenuTemplate':$('#user-menu-template').html(),
 						'userMenuContainer': $('#user-menu'),
-						'editorTemplate': $('#editor-template').html()
+						'editorTemplate': $('#editor-template').html(),
+						'followingTemplate' : $('#following-template').html(),
+						'followingContainer' : $('#following'),
+						'followersTemplate' : $('#followers-template').html(),
+						'followersContainer' : $('#followers')
 					});
 				}
 			})();

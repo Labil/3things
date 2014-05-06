@@ -135,17 +135,31 @@ img.hearticon{
 }
 /***************************************************/
 
-#followers{
+#footer{
     position: fixed;
     background-color: #282828;
     width: 100%;
     bottom: 0;
     left: 0; 
     margin:0;
-    padding: 0;
-    text-align: center;
+    padding: 25px;
     color: white;
-    font-size: 1.5em;
+    font-size: 0.9em;
+}
+
+#following{
+	width: auto;
+	height: auto;
+	display: inline-block;
+	vertical-align: top;
+	margin-right: 100px;
+}
+
+#followers{
+	width: auto;
+	height: auto;
+	display: inline-block;
+	vertical-align: top;
 }
 
 .editCancel{

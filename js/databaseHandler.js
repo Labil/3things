@@ -28,7 +28,6 @@ DatabaseHandler.prototype.init = function(config){
     this.followersContainer = config.followersContainer;
     
     this.loadPage();
-    this.updatePage();
 };
 
 DatabaseHandler.prototype.loadPage = function(){
@@ -85,6 +84,7 @@ DatabaseHandler.prototype.loadPage = function(){
                     };
                 }
                 self.attachPostsTemplate();
+                self.updatePage();
             }
         })
         .fail(function(d, textStatus, error){
@@ -104,8 +104,6 @@ DatabaseHandler.prototype.attachPostsTemplate = function(){
 };
 
 DatabaseHandler.prototype.attachPageInfoTemplate = function(){
-    //console.log(this.user);
-    //console.log(this.viewUser);
     this.pageInfoContainer.html('');
     var data = { 'follow' : (this.user == null || this.user == this.viewUser) ? false : true, 'userProfile' : this.viewUser };
     var template = Handlebars.compile(this.pageInfoTemplate);
@@ -157,7 +155,7 @@ DatabaseHandler.prototype.updatePage = function(){
             self.toggleEditPosts();
             self.toggleLikes();
             self.toggleFollow();
-        }, 500);
+        }, 100);
     })
     .fail(function(d, textStatus, error){
         console.error("Checking if logged in failed in admin.php, status: " + textStatus + ", error: "+error);
@@ -483,9 +481,12 @@ DatabaseHandler.prototype.follow = function(data){
 
 DatabaseHandler.prototype.getFollowing = function(){
     var self = this;
+    if(this.user == null){
+        this.followingContainer.html('');
+        return;
+    }
     $.getJSON(self.db_url + 'req=following&user=' + this.user, function(response){
         if(response.status == 'OK'){
-            console.log(response.result.length);
             if(response.result.length > 0){
                 self.following = $.map(response.result, function(res){ 
                     return {
@@ -505,9 +506,12 @@ DatabaseHandler.prototype.getFollowing = function(){
 
 DatabaseHandler.prototype.getFollowers = function(){
     var self = this;
+    if(this.user == null){
+        this.followersContainer.html('');
+        return;
+    }
     $.getJSON(self.db_url + 'req=followers&user=' + this.user, function(response){
         if(response.status == 'OK'){
-            console.log(response.result.length);
             if(response.result.length > 0){
                 self.followers = $.map(response.result, function(res){ 
                     return {

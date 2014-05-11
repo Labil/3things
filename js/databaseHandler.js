@@ -11,7 +11,7 @@ var DatabaseHandler = function(){
     var d = new Date();
     var month = d.getMonth() + 1;
     var date = d.getDate();
-    this.today = d.getFullYear() + "-" + (month.length == 1 ? month : ("0" + month)) + "-" + (date.length == 1 ? date : ("0" + date)); //Y-M-D
+    this.today = d.getFullYear() + "-" + (month > 9 ? month : ("0" + month)) + "-" + (date > 9 ? date : ("0" + date)); //Y-M-D
 };
 
 DatabaseHandler.prototype.init = function(config){

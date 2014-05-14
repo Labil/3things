@@ -7,12 +7,11 @@
 
     $.dialogbox = function(config){
         if($('#dialogOverlay').length){
-            // A confirm is already shown on the page:
+            // A box is already shown on the page:
             return false;
         }
         var buttonHTML = '';
         $.each(config.buttons,function(name,obj){
-
             // Generating the markup for the buttons:
             buttonHTML += '<a href="#" class="button '+obj['class']+'">'+name+'<span></span></a>';
 
@@ -30,7 +29,10 @@
         ].join('');
 
         $(markup).hide().appendTo('body').fadeIn();
-        $('#dialogBox').center();
+        $('#dialogBox').center({
+            'divideW' : 2,
+            'divideH' : 3
+        });
 
         var buttons = $('#dialogBox .button'),
             i = 0;
@@ -39,15 +41,13 @@
 
         $.each(config.buttons,function(name,obj){
             buttons.eq(i++).click(function(){
-
-                // Calling the action attribute when a
-                // click occurs, and hiding the dialogbox.
-
+                // Calling the action attribute when a click occurs, and hiding the dialogbox.
                 obj.action();
                 $.dialogbox.hide();
                 return false;
             });
         });
+        return this;
     };
     $.dialogbox.hide = function(){
         $('#dialogOverlay').fadeOut(function(){
@@ -56,24 +56,33 @@
     };
 
 
-    /*************************** Popup ************************************/
+    /*************************** Popup message box ************************************/
 
-    $.popupbox = function(config){
+    $.popupbox = function(options){
         if($('#popupBox').length){
-            // A confirm is already shown on the page:
             return false;
         }
-
+        var defaults = {
+            'message' : 'Default message',
+            'appendLocation' : 'body',
+            'time' : 3000
+        };
+        var params = $.extend(defaults, options);
         var markup = [
-            '<div id="popupBox"><p>' + config.message +'</p></div>'
+            '<div id="popupBox"><p>' + params.message +'</p></div>'
         ].join('');
 
-        $(markup).hide().appendTo('body').fadeIn();
-        $('#popupBox').centerHigh();
+        $(markup).hide().appendTo(params.appendLocation).fadeIn();
+        $('#popupBox').center({
+            'divideW' : 2,
+            'divideH' : 3
+        });
 
         setTimeout(function(){
             $.popupbox.hide();
-        }, config.time || 3000);
+        }, params.time);
+
+        return this;
     };
 
     $.popupbox.hide = function(){
@@ -84,22 +93,38 @@
 
     /************************* Popup tip  ****************************/
 
-    /* User sends in config.message, and optionally config.title, config.top and config.left displacement values 
-        and config.time (how longit should show on screen) */
-    $.tipbox = function(config){
+    /* User sends in options.message, and optionally options.title, options.top and options.left displacement values 
+        and options.time (how longit should show on screen) */
+    $.tipbox = function(options){
         if($('#tipBox').length){
             return false;
         }
+        var defaults = {
+            'title' : '',
+            'message' : 'Default message',
+            'appendLocation' : 'body',
+            'left' : 500,
+            'top' : 100,
+            'bottom' : 0,
+            'right' : 0,
+            'position' : 'absolute',
+            'time' : 10000 //10 sec
+        };
+        var params = $.extend(defaults, options);
+
         var markup = [
-            '<div id="tipBox"><h2>' + config.title + '</h2><p>' + config.message + '</p></div>'
+            '<div id="tipBox"><h2>' + params.title + '</h2><p>' + params.message + '</p></div>'
         ].join('');
 
         $(markup).hide().appendTo('body').fadeIn();
-        var elem = $('#tipBox').placement(config.top || 500, config.left || 100, null, null, false);
+        var elem = $('#tipBox').placement({'top' : params.top, 'left' : params.left, 'bottom' : params.bottom,
+                                           'right' : params.right, 'position' : params.position});
        
         setTimeout(function(){
             $.tipbox.hide();
         }, config.time || 10000);
+
+        return this;
     };
     $.tipbox.hide = function(){
         $('#tipBox').fadeOut(function(){
@@ -109,21 +134,33 @@
 
     /************************* back to top button ****************************/
 
-    /* User sends in config.message, and optionally config.top and config.left displacement values */
-    $.backToTopButton = function(config){
+    /* options: options.message, options displacement values */
+    $.backToTopButton = function(options){
         if($('#scrollTop').length){
             return false;
         }
+        var defaults = {
+            'message' : 'Back to top?',
+            'appendLocation':'body',
+            'left' : 500,
+            'top' : 100,
+            'bottom' : 0,
+            'right' : 0,
+            'position' : 'fixed',
+            'time' : 800
+        };
+        var params = $.extend(defaults, options);
 
         var markup = [
-            '<div id="scrollTop">' + config.message + '</div>'
+            '<div id="scrollTop">' + params.message + '</div>'
         ].join('');
 
-        $(markup).hide().appendTo('body').fadeIn();
+        $(markup).hide().appendTo(params.appendLocation).fadeIn();
         var elem = $('#scrollTop');
 
         //default position is bottom right corner, with position:fixed (last param true)
-        elem.placementPercent(config.top || null, config.left || null, config.bottom || 10, config.right || 10, config.fixed || true);
+        elem.placement({'top' : params.top, 'left' : params.left, 'bottom' : params.bottom,
+                        'right' : params.right, 'position' : params.position});
 
         // scroll body back to top on click
         elem.on('click', function(e){
@@ -132,10 +169,10 @@
                 complete: function(){
                     $.backToTopButton.hide();
                 }
-            }, 800);
+            }, params.time);
             e.preventDefault();
-
         });
+        return this;
     };
     $.backToTopButton.hide = function(){
         $('#scrollTop').fadeOut(function(){
@@ -158,7 +195,7 @@
 
         $(markup).hide().appendTo('body').show();
         $('#loadingbar').center();
-
+        return this;
     };
 
     $.loadingbar.hide = function(){
@@ -167,20 +204,14 @@
         });
     };
 
-
     /******************* Log in popup **********************************/
     $.loginpopup = function(config){
         if($('#dialogOverlay').length){
-            // A confirm is already shown on the page:
             return false;
         }
         var buttonHTML = '';
         $.each(config.buttons,function(name,obj){
-
-            // Generating the markup for the buttons:
-
             buttonHTML += '<a href="#" class="button '+obj['class']+'">'+name+'<span></span></a>';
-
             if(!obj.action){
                 obj.action = function(){};
             }
@@ -201,7 +232,10 @@
         ].join('');
 
         $(markup).hide().appendTo('body').fadeIn();
-        $('#loginBox').center();
+        $('#loginBox').center({
+            'divideW' : 2,
+            'divideH' : 3
+        });
 
         var buttons = $('#loginBox .button'),
             i = 0;
@@ -216,6 +250,8 @@
                 }
             });
         });
+
+        return this;
     };
 
     $.loginpopup.hide = function(){

@@ -4,17 +4,8 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>3 things.</title>
-		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-		<script type="text/javascript" src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
-		<script type="text/javascript" src="js/helpis.js"></script>
-		<script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>
-		<script type="text/javascript" src="js/databaseHandler.js"></script>
-		<script type="text/javascript" src="js/site-plugins.js"></script>
-		<script type="text/javascript" src="js/dialogbox.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="css/main.css">
-		<link rel="stylesheet" type="text/css" href="js/site-plugins-style.css">
-		<link rel="stylesheet" type="text/css" href="css/dialogbox.css">
 	</head>
 	<body>
 		<div id="header">
@@ -24,7 +15,7 @@
 			<div id="page-info">
 				<script id="page-info-template" type="text/x-handlebars-template">
 					{{#if userProfile}}
-						<h1 class="userProfile">{{userProfile}}s profile</h1>
+						<h1 class="userProfile">{{userProfile}}´s profile</h1>
 						{{#if follow}}
 							<button class="follow" data-profile="{{userProfile}}">Follow</button>
 						 {{/if}}
@@ -44,7 +35,7 @@
 				<script id="user-menu-template" type="text/x-handlebars-template">
 					{{#if user}}
 						<a href="http://hakestad.io/threethings/?user={{user}}"><p class="userGreeting">Hi, {{user}}!</p></a>
-						<button id="logout">Log out</button>
+						<button id="logout" class="logOutButton">Log out</button>
 					{{else}}
 						<button id="login">Log in</button>
 						<button id="signup">Sign up</button>
@@ -149,6 +140,16 @@
 			</div>	
 		</script>
 
+		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
+		<script type="text/javascript" src="js/handlebars-v1.3.0.js"></script>
+		<script type="text/javascript" src="js/helpis.js"></script>
+		<script type="text/javascript" src="js/randomColors.js"></script>
+		<script type="text/javascript" src="js/jquery.positionElements.js"></script>
+		<script type="text/javascript" src="js/jquery.infoToggleBox.js"></script>
+		<script type="text/javascript" src="js/jquery.boxes.js"></script>
+		<script type="text/javascript" src="js/databaseHandler.js"></script>
+		<script type="text/javascript" src="js/siteManager.js"></script>
 		<script>
 			(function(){
 
@@ -156,18 +157,15 @@
 					'title': 'About',
 					'message1': 'Somebody once suggested to me that, before going to bed every night, I should list three positive things that happened that day and write them down. Even on shitty days. There\'s always something. Blue skies, a good meal, somebody smiles at you on the subway.',
 				    'message2': 'I think it really helps to go to bed in a positive mindset, even after a day where nothing seemed to go your way. Anyway, it helped me, and as a small side project I decided to throw together this tiny conceptual blogplatform.',
-				    'top':0,
-				    'left':20,
-				    'fixed':'false',
 				    'appendLocation':'#about'
 				});
-				if(databaseMgr == undefined){
+				if(siteMgr == undefined){
 					//To make chrome not auto-scroll down if user had scrolled down and then refresh of page
 					$(window).on('beforeunload', function() {
 					    $(window).scrollTop(0);
 					});
-					var databaseMgr = new DatabaseHandler();
-					databaseMgr.init({
+					var siteMgr = new SiteManager();
+					siteMgr.init({
 						'postsTemplate':$('#posts-template').html(),
 						'postsContainer':$('#content'),
 						'pageInfoTemplate': $('#page-info-template').html(),
